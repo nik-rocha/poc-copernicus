@@ -1,6 +1,7 @@
 package com.example.copernicus.api.model
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.NotBlank
 import java.time.LocalDateTime
 
 @Entity
@@ -12,9 +13,11 @@ data class Organization(
     val idOrganization: Long? = null,
 
     @Column(name = "corporate_name", nullable = false, length = 45)
+    @field:NotBlank(message = "O nome da organização não pode ser vazio.")
     var corporateName: String = "",
 
     @Column(name = "registration_code", nullable = false, unique = true, length = 150)
+    @field:NotBlank(message = "O código de registro da organização não pode ser vazio.")
     var registrationCode: String = "",
 
     @Column(name = "created_at", updatable = false)
