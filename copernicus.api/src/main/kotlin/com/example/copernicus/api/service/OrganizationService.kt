@@ -1,7 +1,9 @@
 package com.example.copernicus.api.service
 
+import com.example.copernicus.api.model.Device
 import com.example.copernicus.api.model.Organization
 import com.example.copernicus.api.repository.OrganizationRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -25,6 +27,11 @@ class OrganizationService(private val repository: OrganizationRepository) {
                 registrationCode = organization.registrationCode
             )
         )
+    }
+
+    fun findById(id: Long): Organization {
+        return repository.findByIdOrNull(id)
+            ?: throw RuntimeException("Organização com ID $id não encontrado.")
     }
 
     fun delete(id: Long) {

@@ -17,7 +17,7 @@ data class Collaborator(
     @Column(name = "email", nullable = false, length = 45)
     var email: String,
 
-    @Column(name = "password", nullable = false, length = 45)
+    @Column(name = "password", nullable = false, length = 60)
     var password: String,
 
     @Column(name = "access_level", nullable = false, length = 45)

@@ -1,5 +1,6 @@
 package com.example.copernicus.api.controller
 
+import com.example.copernicus.api.model.Collaborator
 import com.example.copernicus.api.model.Device
 import com.example.copernicus.api.service.DeviceService
 import org.springframework.http.HttpStatus
@@ -17,6 +18,12 @@ class DeviceController(private val service: DeviceService) {
     @GetMapping
     fun read() =
         ResponseEntity.ok(service.findAll())
+
+    @GetMapping("/{id}")
+    fun getById(@PathVariable id: Long): ResponseEntity<Device> {
+        val device = service.findById(id)
+        return ResponseEntity.ok(device)
+    }
 
     @PutMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody device: Device): ResponseEntity<Device> =

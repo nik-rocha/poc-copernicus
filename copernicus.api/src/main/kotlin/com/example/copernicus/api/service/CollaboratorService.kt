@@ -2,6 +2,7 @@ package com.example.copernicus.api.service
 
 import com.example.copernicus.api.model.Collaborator
 import com.example.copernicus.api.repository.CollaboratorRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -27,6 +28,11 @@ class CollaboratorService(private val repository: CollaboratorRepository) {
                 accessLevel = collaborator.accessLevel
             )
         )
+    }
+
+    fun findById(id: Long): Collaborator {
+        return repository.findByIdOrNull(id)
+            ?: throw RuntimeException("Colaborador com ID $id não encontrado.")
     }
 
     fun delete(id: Long) {

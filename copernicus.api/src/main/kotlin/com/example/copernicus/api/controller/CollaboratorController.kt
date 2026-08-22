@@ -18,6 +18,12 @@ class CollaboratorController(private val service: CollaboratorService) {
     fun read() =
         ResponseEntity.ok(service.findAll())
 
+    @GetMapping("/{id}")
+    fun getById(@PathVariable id: Long): ResponseEntity<Collaborator> {
+        val collaborator = service.findById(id)
+        return ResponseEntity.ok(collaborator)
+    }
+
     @PutMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody collaborator: Collaborator): ResponseEntity<Collaborator> =
         ResponseEntity.ok(service.update(id, collaborator))
