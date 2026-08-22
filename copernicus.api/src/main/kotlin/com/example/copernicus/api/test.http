@@ -1,0 +1,7 @@
+POST http://localhost:8080/organizations
+Content-Type: application/json
+
+{
+  "corporateName": "Industria 1",
+  "registrationCode": "WA233"
+}
