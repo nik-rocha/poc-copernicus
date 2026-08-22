@@ -12,10 +12,10 @@ data class Organization(
     val idOrganization: Long? = null,
 
     @Column(name = "corporate_name", nullable = false, length = 45)
-    val corporateName: String,
+    var corporateName: String = "",
 
     @Column(name = "registration_code", nullable = false, unique = true, length = 150)
-    val registrationCode: String,
+    var registrationCode: String = "",
 
     @Column(name = "created_at", updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now()
