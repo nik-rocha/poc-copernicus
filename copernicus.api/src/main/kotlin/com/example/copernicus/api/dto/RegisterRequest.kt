@@ -5,6 +5,9 @@ data class RegisterRequest(
     val email: String,
     val password: String,
     val accessLevel: String,
-    val organizationId: Long? = null
+    val organizationId: Long? = null,
+    val corporateName: String? = null,
+    val registrationCode: String? = null,
+    val hasOrganization: Boolean? = false
 ) {
 }

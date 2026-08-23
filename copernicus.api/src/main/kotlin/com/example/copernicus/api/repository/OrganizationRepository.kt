@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.Optional
 
 interface OrganizationRepository : JpaRepository<Organization, Long> {
+    fun findByRegistrationCode(registrationCode: String): Organization?
 }

@@ -5,6 +5,7 @@ import com.example.copernicus.api.model.Collaborator
 import com.example.copernicus.api.model.Organization
 import com.example.copernicus.api.repository.CollaboratorRepository
 import com.example.copernicus.api.repository.OrganizationRepository
+import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -61,15 +62,33 @@ class CollaboratorService(
 
         return repository.save(newCollaborator)
     }
-
+    @Transactional
     fun register(request: RegisterRequest): Collaborator {
         if (repository.findByEmail(request.email) != null) {
             throw RuntimeException("E-mail já cadastrado no sistema.")
         }
 
-        val organization = request.organizationId?.let { id ->
-            organizationRepository.findByIdOrNull(id)
-                ?: throw RuntimeException("Organização não encontrada com ID: $id")
+        val organization: Organization? = when {
+            request.organizationId != null -> {
+                organizationRepository.findByIdOrNull(request.organizationId)
+                    ?: throw RuntimeException("Organização não encontrada com ID: ${request.organizationId}")
+            }
+
+            !request.corporateName.isNullOrBlank() && !request.registrationCode.isNullOrBlank() -> {
+                // Armazena o código com segurança
+                val code = request.registrationCode
+
+                val existingOrg = organizationRepository.findByRegistrationCode(code)
+
+                existingOrg ?: organizationRepository.save(
+                    Organization(
+                        corporateName = request.corporateName,
+                        registrationCode = code
+                    )
+                )
+            }
+
+            else -> null
         }
 
         val collaborator = Collaborator(

@@ -1,5 +1,6 @@
 package com.example.copernicus.api.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotBlank
 import java.time.LocalDateTime
@@ -31,8 +32,9 @@ data class Collaborator(
     @Column(name = "created_at", updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organization_id", nullable = true)
+    @JoinColumn(name = "organization_id", referencedColumnName = "id_organization", nullable = true)
     var organization: Organization? = null
 ) {
 }

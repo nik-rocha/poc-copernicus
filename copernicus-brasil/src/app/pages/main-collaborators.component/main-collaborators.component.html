@@ -1,0 +1,68 @@
+<main>
+  <nav class="left-navbar">
+    <div class="nav-top">
+      <img src="/logo_white.png" alt="">
+      <div id="white-div"></div>
+      <div class="organization-info">
+        <h1>Organização:</h1>
+        <h2>{{ organization()?.corporateName}}</h2>
+      </div>
+      <div class="navigate-org-options">
+        <button class="navigate-org-devices" id="org-option">
+          <fa-icon [icon]='faHardDrive'></fa-icon>
+          <p id="option-title">Dispositivos</p>
+        </button>
+        <button class="navigate-org-collaborators" id="org-option">
+          <fa-icon [icon]='faUserGroup'></fa-icon>
+          <p id="option-title">Colaboradores</p>
+        </button>
+        <button class="navigate-org-organizations" id="org-option">
+          <fa-icon [icon]='faBuilding'></fa-icon>
+          <p id="option-title">Organizações</p>
+        </button>
+      </div>
+    </div>
+    <div class="nav-bottom">
+      <div id="white-div"></div>
+      <div class="exit-config">
+        <button class="exit-button">
+          <fa-icon [icon]='faRightToBracket'></fa-icon>
+          <p>Sair</p>
+        </button>
+        <fa-icon [icon]='faGear'></fa-icon>
+      </div>
+    </div>
+  </nav>
+  <div class="right-main">
+    <div class="right-main-container">
+      <div class="right-top">
+        <h1>Dispositivos</h1>
+        <div class="search-add">
+          <input type="text" placeholder="Pesquisar...">
+          <button>
+            <fa-icon [icon]='faCirclePlus'></fa-icon>
+          </button>
+        </div>
+      </div>
+      <div class="right-center">
+        <div class="collaborator-card">
+          <div class="card-center">
+            <div class="info-display">
+              <p>Nome:</p>
+              <h3>Marcos Lima de Oliveira</h3>
+            </div>
+            <div class="info-display">
+              <p>E-mail:</p>
+              <h3>marcos.lima@gmail.com</h3>
+            </div>
+            <div class="info-display">
+              <p>Nível de Acesso:</p>
+              <h3>Operador</h3>
+            </div>
+          </div>
+          <div class="card-bottom"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
