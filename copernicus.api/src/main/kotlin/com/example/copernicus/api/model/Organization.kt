@@ -21,6 +21,12 @@ data class Organization(
     var registrationCode: String = "",
 
     @Column(name = "created_at", updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var collaborators: MutableList<Collaborator> = mutableListOf(),
+
+    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var devices: MutableList<Device> = mutableListOf()
 ) {
 }
