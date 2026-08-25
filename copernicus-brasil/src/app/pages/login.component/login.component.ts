@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { RegisterUserRequest } from '../../models/register.model';
@@ -28,12 +28,13 @@ export class LoginComponent implements OnInit {
   faEye = faEye
   faEyeSlash = faEyeSlash
 
-  currentLoginPage: string = 'login';
-  isLoading: boolean = false;
-  showPass: boolean = false;
+  currentLoginPage = signal<string>('login');
+  isLoading = signal(false);
+  showPass = signal(false);
   selectedOrganizationId: number | null = null;
-  errorMessage: string = '';
-  successMessage: string = '';
+  returnFromRegister: boolean = false;
+  errorMessage = signal('');
+  successMessage = signal('');
 
   formData: RegisterUserRequest = {
     fullName: '',
@@ -62,19 +63,20 @@ export class LoginComponent implements OnInit {
       this.organizations = Array.isArray(response) ? response : (response ? [response] : []);
     } catch (e: any) {
       const message = e.response?.data?.message || 'Erro ao carregar a lista de organizações.';
-      this.errorMessage = message
+      this.errorMessage.set(message)
     }
   }
 
   async onLoginSubmit(): Promise<void> {
-    this.errorMessage = ''
+    this.errorMessage.set('')
+    this.successMessage.set('');
 
     if (!this.loginData.email || !this.loginData.password) {
-      this.errorMessage = 'Preencha todos os campos antes de continuar.';
+      this.errorMessage.set('Preencha todos os campos antes de continuar.');
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
 
     try {
       const response = await this.authService.login(this.loginData);
@@ -84,48 +86,51 @@ export class LoginComponent implements OnInit {
     } catch (e: any) {
       console.error('Erro no login:', e);
       const message = e.response?.data?.message || 'E-mail ou senha inválidos.';
-      this.errorMessage = message;
+      this.errorMessage.set(message);
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 
   async onRegisterSubmit(): Promise<void> {
-    this.isLoading = true;
-    this.successMessage = '';
+    this.returnFromRegister = true;
+    this.isLoading.set(true);
+    this.successMessage.set('');
+    this.errorMessage.set('');
 
     try {
-      const result = await this.authService.register(this.formData);
-      console.log("Cadastro com sucesso:", result);
+      await this.authService.register(this.formData);
 
-      this.currentLoginPage = 'login';
+      this.successMessage.set('Cadastro realizado com sucesso! Faça login para continuar.');
+      this.currentLoginPage.set('login');
     } catch (e: any) {
 
       const message = e.response?.data?.message || 'Erro no cadastro.';
-      this.errorMessage = message
+      this.errorMessage.set(message)
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 
   togglePasswordVisibility(): void {
-    this.showPass = !this.showPass;
+    this.showPass.set(!this.showPass());
   }
 
   setLoginReturnPage(page: string): void {
-    this.errorMessage = ''
-    this.currentLoginPage = page;
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    this.currentLoginPage.set(page);
   }
 
   setLoginPage(page: string): void {
-    this.errorMessage = ''
+    this.errorMessage.set('')
 
-    if (this.currentLoginPage != 'login' && (!this.formData.fullName || !this.formData.email || !this.formData.password)) {
-      this.errorMessage = 'Preencha todos os campos antes de continuar.';
+    if (this.currentLoginPage() != 'login' && (!this.formData.fullName || !this.formData.email || !this.formData.password)) {
+      this.errorMessage.set('Preencha todos os campos antes de continuar.');
       return;
     }
 
-    this.currentLoginPage = page;
+    this.currentLoginPage.set(page);
   }
 
   resetAssets(): void {

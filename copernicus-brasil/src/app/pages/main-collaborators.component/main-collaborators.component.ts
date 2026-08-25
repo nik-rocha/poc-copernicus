@@ -49,6 +49,7 @@ export class MainCollaboratorsComponent implements OnInit {
   modalState = signal<ModalState | null>(null);
   modalTarget = signal<Collaborator | Device | Organization | null>(null);
   editingCollaboratorEmail: string | null = null;
+  errorMessage = signal('');
 
   collaboratorForm: Partial<Collaborator> & { organizationId?: number } = {
     fullName: '', email: '', password: '', accessLevel: 'OPERATOR'
@@ -219,6 +220,7 @@ export class MainCollaboratorsComponent implements OnInit {
   openModal(entity: ModalEntity, action: ModalAction, target?: any): void {
   this.modalState.set({ entity, action });
   this.modalTarget.set(target ?? null);
+  this.errorMessage.set('')
 
   if (action === 'edit' && target) {
     if (entity === 'collaborator') this.collaboratorForm = { ...target };
@@ -243,60 +245,83 @@ export class MainCollaboratorsComponent implements OnInit {
 }
 
 closeModal(): void {
+  this.errorMessage.set('')
   this.modalState.set(null);
   this.modalTarget.set(null);
 }
 
 async confirmAction(): Promise<void> {
   const state = this.modalState();
-    if (!state) return;
+  if (!state) return;
 
-    const { entity, action } = state;
-    const targetId = (this.modalTarget() as any)?.idCollaborator
-      ?? (this.modalTarget() as any)?.idDevice
-      ?? (this.modalTarget() as any)?.idOrganization;
+  const { entity, action } = state;
+  const targetId = (this.modalTarget() as any)?.idCollaborator
+    ?? (this.modalTarget() as any)?.idDevice
+    ?? (this.modalTarget() as any)?.idOrganization;
 
-    try {
-      if (entity === 'collaborator') {
-        if (action === 'create') {
-          await this.collaboratorService.create(this.collaboratorForm)
-        };
-        if (action === 'edit') {
-          const isSelf = this.currentUser()?.email === this.editingCollaboratorEmail
-          const emailChanged = this.editingCollaboratorEmail !== this.collaboratorForm.email
+  try {
+    let createdId: number | undefined;
 
-          await this.collaboratorService.update(targetId!, this.collaboratorForm)
-
-          if (isSelf && emailChanged) {
-            alert("Como você mudou seu e-mail, logue no sistema novamente para confirmar a mudança.")
-            this.logout()
-            return
-          }
-        };
-        if (action === 'delete') {
-          await this.collaboratorService.delete(targetId!)
-        };
+    if (entity === 'collaborator') {
+      if (action === 'create') {
+        const created = await this.collaboratorService.create(this.collaboratorForm);
+        createdId = created.idCollaborator;
       }
+      if (action === 'edit') {
+        const isSelf = this.currentUser()?.email === this.editingCollaboratorEmail;
+        const emailChanged = this.editingCollaboratorEmail !== this.collaboratorForm.email;
 
-      if (entity === 'device') {
-        if (action === 'create') await this.deviceService.create(this.deviceForm);
-        if (action === 'edit') await this.deviceService.update(targetId!, this.deviceForm);
-        if (action === 'delete') await this.deviceService.delete(targetId!);
+        await this.collaboratorService.update(targetId!, this.collaboratorForm);
+
+        if (isSelf && emailChanged) {
+          alert("Como você mudou seu e-mail, logue no sistema novamente para confirmar a mudança.");
+          this.logout();
+          return;
+        }
       }
-
-      if (entity === 'organization') {
-        if (action === 'create') await this.orgService.create(this.organizationForm);
-        if (action === 'edit') await this.orgService.update(targetId!, this.organizationForm);
-        if (action === 'delete') await this.orgService.delete(targetId!);
+      if (action === 'delete') {
+        await this.collaboratorService.delete(targetId!);
       }
-
-      this.closeModal();
-      await this.reloadData();
-
-    } catch (e: any) {
-      const message = e.response?.data?.message || 'Erro ao processar a ação.';
-      alert(message)
     }
+
+    if (entity === 'device') {
+      if (action === 'create') {
+        const created = await this.deviceService.create(this.deviceForm);
+        createdId = created.idDevice;
+      }
+      if (action === 'edit') await this.deviceService.update(targetId!, this.deviceForm);
+      if (action === 'delete') await this.deviceService.delete(targetId!);
+    }
+
+    if (entity === 'organization') {
+      if (action === 'create') {
+        const created = await this.orgService.create(this.organizationForm);
+        createdId = created.idOrganization;
+      }
+      if (action === 'edit') await this.orgService.update(targetId!, this.organizationForm);
+      if (action === 'delete') await this.orgService.delete(targetId!);
+    }
+
+    this.closeModal();
+    await this.reloadData();
+
+    if (action === 'create' && createdId) {
+      this.scrollToItem(entity, createdId);
+    }
+
+  } catch (e: any) {
+    const message = e.response?.data?.message || 'Erro ao processar a ação.';
+    alert(message);
+  }
+}
+
+  private scrollToItem(entity: ModalEntity, id: number): void {
+    const prefix = entity === 'collaborator' ? 'collaborator' : entity === 'device' ? 'device' : 'organization';
+
+    setTimeout(() => {
+      const el = document.querySelector(`[data-id="${prefix}-${id}"]`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
   }
 
     private async reloadData(): Promise<void> {

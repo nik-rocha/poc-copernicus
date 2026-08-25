@@ -96,7 +96,7 @@
         } @else {
           <div class="right-center">
             @for (device of filteredDevices(); track device.idDevice) {
-              <div class="data-card" id="card">
+              <div class="data-card" id="card" [attr.data-id]="'device-' + device.idDevice">
                 <div class="card-center">
                   <div class="info-display">
                     <p id="info-label">Modelo:</p>
@@ -131,7 +131,7 @@
         } @else {
           <div class="right-center">
             @for (collaborator of filteredCollaborators(); track collaborator.idCollaborator) {
-              <div class="data-card" id="card">
+              <div class="data-card" id="card" [attr.data-id]="'collaborator-' + collaborator.idCollaborator">
                 <div class="card-center">
                   <div class="info-display">
                     <p id="info-label">Nome:</p>
@@ -178,7 +178,7 @@
           } @else {
             <div class="right-center">
               @for (organization of filteredOrganizations(); track organization.idOrganization) {
-                <div class="data-card" id="card" (click)="selectOrganization(organization)">
+                <div class="data-card" id="card" (click)="selectOrganization(organization)" [attr.data-id]="'organization-' + organization.idOrganization">
                   <div class="card-center">
                     <div class="info-display">
                       <h3 id="info-main">{{ organization.corporateName }}</h3>

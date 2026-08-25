@@ -3,39 +3,43 @@
     <img src="/column.png" alt="Documento" class="rotating-doc">
   </div>
   <div class="right-login">
-    @if (currentLoginPage === 'login') {
+    @if (currentLoginPage() === 'login') {
       <div class="login-container" id="login">
       <img src="/logo_black.png" alt="Copernicus Brasil">
       <h1>Bem-vindo!</h1>
-      @if (errorMessage) {
-        <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616;" class="error-message">
-          {{ errorMessage }}
+      @if (errorMessage()) {
+        <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 60%; text-align: center" class="error-message">
+          {{ errorMessage() }}
         </p>
-      } 
+      } @else if (successMessage()) {
+        <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #0a9e22; font-weight: 600; width: 60%; text-align: center" class="success-message">
+          {{ successMessage() }}
+        </p>
+      }
       <div class="input-group">
         <div class="email-input" id="input">
           <label for="email">E-mail:</label>
-          <input type="text" [(ngModel)]="loginData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage" (input)="errorMessage = ''">
+          <input type="text" [(ngModel)]="loginData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
         </div>
         <div class="password-input" id="input">
           <label for="pass">Senha:</label>
           <div class="see-pass">
-            <input [type]="showPass ? 'text' : 'password'" [(ngModel)]="loginData.password" name="pass" id="pass" placeholder="Digite sua senha...">
-            <button><fa-icon [icon]="showPass ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
+            <input [type]="showPass() ? 'text' : 'password'" [(ngModel)]="loginData.password" name="pass" id="pass" placeholder="Digite sua senha...">
+            <button><fa-icon [icon]="showPass() ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
           </div>
         </div>
         <p>Não possui uma conta? <a href="#" (click)="setLoginPage('register'); resetAssets()">Clique aqui.</a></p>
-        <button type="submit" [disabled]="isLoading" (click)="onLoginSubmit()" id="send">{{ isLoading ? 'Entrando...' : 'Entrar' }}</button>
+        <button type="submit" [disabled]="isLoading()" (click)="onLoginSubmit()" id="send">{{ isLoading() ? 'Entrando...' : 'Entrar' }}</button>
       </div>
     </div>
     }
-    @else if (currentLoginPage === "register") {
+    @else if (currentLoginPage() === "register") {
       <div class="login-container" id="login">
       <img src="/logo_black.png" alt="Copernicus Brasil">
-      @if (errorMessage) {
+      @if (errorMessage()) {
         <h1 style="margin-bottom: 2rem;">Crie sua Conta</h1>
-        <p style="font-size: 2rem; margin-bottom: 2rem; color: #ca1616;" class="error-message">
-          {{ errorMessage }}
+        <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 60%; text-align: center;" class="error-message">
+          {{ errorMessage() }}
         </p>
       } @else {
         <h1>Crie sua Conta</h1>
@@ -43,17 +47,17 @@
       <div class="input-group">
         <div class="name-input" id="input">
           <label for="name">Nome completo:</label>
-          <input type="text" [(ngModel)]="formData.fullName" name="name" id="name" placeholder="Digite o seu nome..." [class.is-invalid]="errorMessage" (input)="errorMessage = ''">
+          <input type="text" [(ngModel)]="formData.fullName" name="name" id="name" placeholder="Digite o seu nome..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
         </div>
         <div class="email-input" id="input">
           <label for="email">E-mail:</label>
-          <input type="text" [(ngModel)]="formData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage" (input)="errorMessage = ''">
+          <input type="text" [(ngModel)]="formData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
         </div>
         <div class="password-input" id="input">
           <label for="pass">Senha:</label>
           <div class="see-pass">
-            <input [type]="showPass ? 'text' : 'password'" name="pass" id="pass" [(ngModel)]="formData.password" placeholder="Digite sua senha..." [class.is-invalid]="errorMessage" (input)="errorMessage = ''">
-            <button><fa-icon [icon]="showPass ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
+            <input [type]="showPass() ? 'text' : 'password'" name="pass" id="pass" [(ngModel)]="formData.password" placeholder="Digite sua senha..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+            <button><fa-icon [icon]="showPass() ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
           </div>
         </div>
         <div class="radio-group">
@@ -64,7 +68,7 @@
               name="accessLevel"
               value="OPERATOR"
               [(ngModel)]="formData.accessLevel"
-              [class.is-invalid]="errorMessage" (input)="errorMessage = ''"
+              [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')"
             />
             <span class="radio-mark"></span>
             <span class="label-text">Operador</span>
@@ -75,7 +79,7 @@
               name="accessLevel"
               value="MANAGER"
               [(ngModel)]="formData.accessLevel"
-              [class.is-invalid]="errorMessage" (input)="errorMessage = ''"
+              [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')"
             />
             <span class="radio-mark"></span>
             <span class="label-text">Gerente</span>
@@ -86,7 +90,7 @@
       </div>
     </div>
     }
-    @else if (currentLoginPage === "registerOrg") {
+    @else if (currentLoginPage() === "registerOrg") {
       <div class="login-container" id="login">
       <img src="/logo_black.png" alt="Copernicus Brasil">
       <h1>Qual sua Organização?</h1>
@@ -134,7 +138,9 @@
             <input type="text" [(ngModel)]="formData.registrationCode" name="cnpj" id="cnpj" placeholder="Digite o CNPJ...">
           </div>
         }
-        <button type="submit" id="send" (click)="setLoginPage('login'); onRegisterSubmit()" [disabled]="isLoading">{{ isLoading ? 'Cadastrando...' : 'Criar Conta e ir para Login' }}</button>
+        <button type="submit" id="send" (click)="onRegisterSubmit()" [disabled]="isLoading()">
+          {{ isLoading() ? 'Cadastrando...' : 'Criar Conta e ir para Login' }}
+        </button>
         <button id="return" (click)="setLoginReturnPage('login'); resetAssets()">Voltar ao Login</button>
       </div>
     </div>
