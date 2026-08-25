@@ -7,10 +7,15 @@
       <div class="login-container" id="login">
       <img src="/logo_black.png" alt="Copernicus Brasil">
       <h1>Bem-vindo!</h1>
+      @if (errorMessage) {
+        <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616;" class="error-message">
+          {{ errorMessage }}
+        </p>
+      } 
       <div class="input-group">
         <div class="email-input" id="input">
           <label for="email">E-mail:</label>
-          <input type="text" [(ngModel)]="loginData.email" name="email" id="email" placeholder="Digite o seu e-mail...">
+          <input type="text" [(ngModel)]="loginData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage" (input)="errorMessage = ''">
         </div>
         <div class="password-input" id="input">
           <label for="pass">Senha:</label>
@@ -27,20 +32,27 @@
     @else if (currentLoginPage === "register") {
       <div class="login-container" id="login">
       <img src="/logo_black.png" alt="Copernicus Brasil">
-      <h1>Crie sua Conta</h1>
+      @if (errorMessage) {
+        <h1 style="margin-bottom: 2rem;">Crie sua Conta</h1>
+        <p style="font-size: 2rem; margin-bottom: 2rem; color: #ca1616;" class="error-message">
+          {{ errorMessage }}
+        </p>
+      } @else {
+        <h1>Crie sua Conta</h1>
+      }
       <div class="input-group">
         <div class="name-input" id="input">
           <label for="name">Nome completo:</label>
-          <input type="text" [(ngModel)]="formData.fullName" name="name" id="name" placeholder="Digite o seu nome...">
+          <input type="text" [(ngModel)]="formData.fullName" name="name" id="name" placeholder="Digite o seu nome..." [class.is-invalid]="errorMessage" (input)="errorMessage = ''">
         </div>
         <div class="email-input" id="input">
           <label for="email">E-mail:</label>
-          <input type="text" [(ngModel)]="formData.email" name="email" id="email" placeholder="Digite o seu e-mail...">
+          <input type="text" [(ngModel)]="formData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage" (input)="errorMessage = ''">
         </div>
         <div class="password-input" id="input">
           <label for="pass">Senha:</label>
           <div class="see-pass">
-            <input [type]="showPass ? 'text' : 'password'" name="pass" id="pass" [(ngModel)]="formData.password" placeholder="Digite sua senha...">
+            <input [type]="showPass ? 'text' : 'password'" name="pass" id="pass" [(ngModel)]="formData.password" placeholder="Digite sua senha..." [class.is-invalid]="errorMessage" (input)="errorMessage = ''">
             <button><fa-icon [icon]="showPass ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
           </div>
         </div>
@@ -52,6 +64,7 @@
               name="accessLevel"
               value="OPERATOR"
               [(ngModel)]="formData.accessLevel"
+              [class.is-invalid]="errorMessage" (input)="errorMessage = ''"
             />
             <span class="radio-mark"></span>
             <span class="label-text">Operador</span>
@@ -62,6 +75,7 @@
               name="accessLevel"
               value="MANAGER"
               [(ngModel)]="formData.accessLevel"
+              [class.is-invalid]="errorMessage" (input)="errorMessage = ''"
             />
             <span class="radio-mark"></span>
             <span class="label-text">Gerente</span>
@@ -104,8 +118,8 @@
           <label for="organization">Selecione sua organização:</label>
           <select name="organization" id="organization" [(ngModel)]="formData.organizationId">
             <option [value]="null" disabled selected>Selecione uma empresa...</option>
-            @for (org of organizations; track org.id) {
-              <option [value]="org.id">{{ org.name }}</option>
+            @for (org of organizations; track org.idOrganization) {
+              <option [value]="org.idOrganization">{{ org.corporateName }}</option>
             }
           </select>
         </div>

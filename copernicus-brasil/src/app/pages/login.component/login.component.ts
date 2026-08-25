@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { RegisterUserRequest } from '../../models/register.model';
@@ -7,6 +7,8 @@ import { faEye } from '@fortawesome/free-solid-svg-icons'
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { LoginRequest } from '../../models/login.model';
 import { Router } from '@angular/router';
+import { Organization } from '../../models/organization.model';
+import { OrganizationService } from '../../services/organization.service';
 
 @Component({
   imports: [
@@ -17,9 +19,10 @@ import { Router } from '@angular/router';
   styleUrl: './login.component.css',
   templateUrl: './login.component.html',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
   private authService = inject(AuthService);
+  private orgService = inject(OrganizationService);
   private router = inject(Router);
 
   faEye = faEye
@@ -29,6 +32,8 @@ export class LoginComponent {
   isLoading: boolean = false;
   showPass: boolean = false;
   selectedOrganizationId: number | null = null;
+  errorMessage: string = '';
+  successMessage: string = '';
 
   formData: RegisterUserRequest = {
     fullName: '',
@@ -46,11 +51,26 @@ export class LoginComponent {
     password: ''
   };
 
+  organizations: Organization[] = [];
+
   constructor() {}
 
+  async ngOnInit(): Promise<void> {
+    try {
+      const response = await this.orgService.getAllOrganizations();
+
+      this.organizations = Array.isArray(response) ? response : (response ? [response] : []);
+    } catch (e: any) {
+      const message = e.response?.data?.message || 'Erro ao carregar a lista de organizações.';
+      this.errorMessage = message
+    }
+  }
+
   async onLoginSubmit(): Promise<void> {
+    this.errorMessage = ''
+
     if (!this.loginData.email || !this.loginData.password) {
-      alert('Preencha o e-mail e a senha.');
+      this.errorMessage = 'Preencha todos os campos antes de continuar.';
       return;
     }
 
@@ -61,10 +81,10 @@ export class LoginComponent {
       console.log('Login realizado com sucesso:', response);
 
       this.router.navigate(['/mainpage']);
-    } catch (error: any) {
-      console.error('Erro no login:', error);
-      const errorMessage = error.response?.data?.message || 'E-mail ou senha inválidos.';
-      alert(errorMessage);
+    } catch (e: any) {
+      console.error('Erro no login:', e);
+      const message = e.response?.data?.message || 'E-mail ou senha inválidos.';
+      this.errorMessage = message;
     } finally {
       this.isLoading = false;
     }
@@ -72,18 +92,17 @@ export class LoginComponent {
 
   async onRegisterSubmit(): Promise<void> {
     this.isLoading = true;
+    this.successMessage = '';
 
     try {
       const result = await this.authService.register(this.formData);
       console.log("Cadastro com sucesso:", result);
 
-      alert('Cadastro realizado com sucesso.');
       this.currentLoginPage = 'login';
-    } catch (error: any) {
-      console.error("Erro na requisição:", error);
+    } catch (e: any) {
 
-      const errorMessage = error.response?.data?.message || 'Erro no cadastro.';
-      alert(errorMessage)
+      const message = e.response?.data?.message || 'Erro no cadastro.';
+      this.errorMessage = message
     } finally {
       this.isLoading = false;
     }
@@ -94,23 +113,20 @@ export class LoginComponent {
   }
 
   setLoginReturnPage(page: string): void {
+    this.errorMessage = ''
     this.currentLoginPage = page;
   }
 
   setLoginPage(page: string): void {
+    this.errorMessage = ''
+
     if (this.currentLoginPage != 'login' && (!this.formData.fullName || !this.formData.email || !this.formData.password)) {
-      alert('Preencha todos os campos antes de continuar.');
+      this.errorMessage = 'Preencha todos os campos antes de continuar.';
       return;
     }
 
     this.currentLoginPage = page;
   }
-
-  organizations = [
-    { id: 1, name: 'Copernicus Matriz' },
-    { id: 2, name: 'Copernicus Filial SP' },
-    { id: 3, name: 'Empresa Parceira' }
-  ];
 
   resetAssets(): void {
     this.formData = {
@@ -122,6 +138,11 @@ export class LoginComponent {
       corporateName: '',
       registrationCode: '',
       organizationId: null
+    }
+
+    this.loginData = {
+      email: '',
+      password: ''
     }
   }
 }

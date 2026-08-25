@@ -1,6 +1,7 @@
 package com.example.copernicus.api.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotBlank
 import java.time.LocalDateTime
@@ -23,6 +24,7 @@ data class Collaborator(
 
     @Column(name = "password", nullable = false, length = 60)
     @field:NotBlank(message = "A senha do colaborador não pode ser vazia.")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     var password: String?,
 
     @Column(name = "access_level", nullable = false, length = 45)

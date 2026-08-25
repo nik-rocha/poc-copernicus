@@ -1,23 +1,49 @@
 <main>
   <nav class="left-navbar">
     <div class="nav-top">
-      <img src="/logo_white.png" alt="">
+      <img src="/logo_white.png" alt="" />
       <div id="white-div"></div>
       <div class="organization-info">
-        <h1>Organização:</h1>
-        <h2>{{ organization()?.corporateName}}</h2>
+        <h1>
+          @if (orgView === 'organizations') {
+            Organizações
+          } @else if (orgView === 'collaborators') {
+            Colaboradores
+          } @else {
+            Dispositivos
+          }
+        </h1>
+        <h2> @if (selectedOrganization()) {
+            {{ selectedOrganization()?.corporateName }}
+          } @else {
+            Vendo tudo
+          }
+        </h2>
+        <button class="return-org" (click)="resetOrg()" [style.display]="(!isManager() || selectedOrganization() == null) ? 'none' : 'flex'">
+          <fa-icon [icon]="faRightToBracket"></fa-icon>
+          <p id="option-title">Sair da organização</p>
+        </button>
       </div>
       <div class="navigate-org-options">
-        <button class="navigate-org-devices" id="org-option">
-          <fa-icon [icon]='faHardDrive'></fa-icon>
+        <button class="navigate-org-devices" (click)="changeView('devices')" id="org-option">
+          <fa-icon [icon]="faHardDrive"></fa-icon>
           <p id="option-title">Dispositivos</p>
         </button>
-        <button class="navigate-org-collaborators" id="org-option">
-          <fa-icon [icon]='faUserGroup'></fa-icon>
+        <button
+          class="navigate-org-collaborators"
+          (click)="changeView('collaborators')"
+          id="org-option"
+        >
+          <fa-icon [icon]="faUserGroup"></fa-icon>
           <p id="option-title">Colaboradores</p>
         </button>
-        <button class="navigate-org-organizations" id="org-option">
-          <fa-icon [icon]='faBuilding'></fa-icon>
+        <button
+          class="navigate-org-organizations"
+          (click)="changeView('organizations')"
+          [style.display]="!isManager() ? 'none' : 'flex'"
+          id="org-option"
+        >
+          <fa-icon [icon]="faBuilding"></fa-icon>
           <p id="option-title">Organizações</p>
         </button>
       </div>
@@ -25,44 +51,256 @@
     <div class="nav-bottom">
       <div id="white-div"></div>
       <div class="exit-config">
-        <button class="exit-button">
-          <fa-icon [icon]='faRightToBracket'></fa-icon>
+        <button class="exit-button" (click)="logout()">
+          <fa-icon [icon]="faRightToBracket"></fa-icon>
           <p>Sair</p>
         </button>
-        <fa-icon [icon]='faGear'></fa-icon>
       </div>
     </div>
   </nav>
   <div class="right-main">
     <div class="right-main-container">
       <div class="right-top">
-        <h1>Colaboradores</h1>
+        <div class="greetings-text">
+          <h1>
+            @if (orgView === 'organizations') {
+              Organizações
+            } @else if (orgView === 'collaborators') {
+              Colaboradores
+            } @else {
+              Dispositivos
+            }
+          </h1>
+          <h2>Logado como {{ currentUser()?.fullName }}</h2>
+        </div>
         <div class="search-add">
-          <input type="text" placeholder="Pesquisar...">
-          <button>
-            <fa-icon [icon]='faCirclePlus'></fa-icon>
+          <input type="text" placeholder="Pesquisar..." [ngModel]="searchTerm()" (ngModelChange)="onSearchChange($event)"/>
+          <button [style.display]="(!isManager() && orgView !== 'devices') ? 'none' : 'flex'" (click)="openModal(
+                orgView === 'devices' ? 'device' : (orgView === 'collaborators' ? 'collaborator' : 'organization'),
+                'create'
+              )">
+            <fa-icon [icon]="faCirclePlus"></fa-icon>
           </button>
         </div>
       </div>
-      <div class="right-center">
-        <div class="collaborator-card">
-          <div class="card-center">
-            <div class="info-display">
-              <p>Nome:</p>
-              <h3>Marcos Lima de Oliveira</h3>
-            </div>
-            <div class="info-display">
-              <p>E-mail:</p>
-              <h3>marcos.lima@gmail.com</h3>
-            </div>
-            <div class="info-display">
-              <p>Nível de Acesso:</p>
-              <h3>Operador</h3>
-            </div>
+      @if (orgView === 'devices') {
+        @if (!devices().length) {
+          <div class="empty-data" id="devices">
+            <h1>Não existem dispositivos nessa organização.</h1>
+            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
           </div>
-          <div class="card-bottom"></div>
-        </div>
-      </div>
+        } @else if (filteredDevices().length == 0) {
+            <div class="empty-data" id="devices">
+              <h1>Nenhum dispositivo foi encontrado.</h1>
+          </div>
+        } @else {
+          <div class="right-center">
+            @for (device of filteredDevices(); track device.idDevice) {
+              <div class="data-card" id="card">
+                <div class="card-center">
+                  <div class="info-display">
+                    <p id="info-label">Modelo:</p>
+                    <h3 id="info-main">{{ device.model }}</h3>
+                  </div>
+                  <div class="info-display">
+                    <p id="info-label">Etiqueta do Ativo:</p>
+                    <h3 id="info-main">{{ device.assetTag }}</h3>
+                  </div>
+                </div>
+                <div class="card-bottom">
+                  <div id="black" [style.display]="!isManager() ? 'none' : 'flex'"></div>
+                  <div class="options-buttons" [style.display]="!isManager() ? 'none' : 'flex'">
+                    <button class="btn-option" id="edit-btn" (click)="$event.stopPropagation(); openModal('device', 'edit', device)">Editar</button>
+                    <button class="btn-option" id="delete-btn" (click)="$event.stopPropagation(); openModal('device', 'delete', device)">Excluir</button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      } @else if (orgView === 'collaborators') {
+        @if (!collaborators().length) {
+          <div class="empty-data" id="devices">
+            <h1>Não existem colaboradores nessa organização.</h1>
+            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
+          </div>
+        } @else if (filteredCollaborators().length == 0) {
+            <div class="empty-data" id="devices">
+              <h1>Nenhum colaborador foi encontrado.</h1>
+          </div>
+        } @else {
+          <div class="right-center">
+            @for (collaborator of filteredCollaborators(); track collaborator.idCollaborator) {
+              <div class="data-card" id="card">
+                <div class="card-center">
+                  <div class="info-display">
+                    <p id="info-label">Nome:</p>
+                    <h3 id="info-main">{{ collaborator.fullName }}</h3>
+                  </div>
+                  <div class="info-display">
+                    <p id="info-label">E-mail:</p>
+                    <h3 id="info-main">{{ collaborator.email }}</h3>
+                  </div>
+                  <div class="info-display">
+                    <p id="info-label">Nível de Acesso:</p>
+                    <h3 id="info-main">
+                      {{ collaborator.accessLevel === 'MANAGER' ? 'Gerente' : 'Operador' }}
+                    </h3>
+                  </div>
+                  <div class="info-display">
+                    <p id="info-label">Organização:</p>
+                    <h3 id="info-main">
+                      {{ collaborator.organizationName }}
+                    </h3>
+                  </div>
+                </div>
+                <div class="card-bottom">
+                  <div id="black" [style.display]="!isManager() ? 'none' : 'flex'"></div>
+                  <div class="options-buttons" [style.display]="!isManager() ? 'none' : 'flex'">
+                    <button class="btn-option" id="edit-btn" (click)="$event.stopPropagation(); openModal('collaborator', 'edit', collaborator)">Editar</button>
+                    <button class="btn-option" id="delete-btn" (click)="$event.stopPropagation(); openModal('collaborator', 'delete', collaborator)" [style.display]="currentUser()?.fullName == collaborator.fullName ? 'none' : 'flex'">Remover</button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      } @else if (orgView === 'organizations') {
+          @if (!organizations().length) {
+            <div class="empty-data" id="devices">
+              <h1>Não existem organizações no sistema.</h1>
+              <fa-icon [icon]="faFileCircleXmark"></fa-icon>
+            </div>
+          } @else if (filteredOrganizations().length == 0) {
+            <div class="empty-data" id="devices">
+              <h1>Nenhuma organização foi encontrada.</h1>
+          </div>
+          } @else {
+            <div class="right-center">
+              @for (organization of filteredOrganizations(); track organization.idOrganization) {
+                <div class="data-card" id="card" (click)="selectOrganization(organization)">
+                  <div class="card-center">
+                    <div class="info-display">
+                      <h3 id="info-main">{{ organization.corporateName }}</h3>
+                    </div>
+                    <div class="info-display">
+                      <p id="info-label">CNPJ:</p>
+                      <h3 id="info-main">{{ organization.registrationCode }}</h3>
+                    </div>
+                  </div>
+                  <div class="card-bottom">
+                    <div id="black" [style.display]="!isManager() ? 'none' : 'flex'"></div>
+                    <div class="options-buttons" [style.display]="!isManager() ? 'none' : 'flex'">
+                      <button class="btn-option" id="edit-btn" (click)="$event.stopPropagation(); openModal('organization', 'edit', organization)">Editar</button>
+                      <button class="btn-option" id="delete-btn" (click)="$event.stopPropagation(); openModal('organization', 'delete', organization)" [style.display]="currentUser()?.organizationId == organization.idOrganization ? 'none' : 'flex'">Excluir</button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+      }
     </div>
   </div>
+  @if (modalState(); as state) {
+    <div class="modal-overlay" (click)="closeModal()">
+
+      @if (state.action === 'create' || state.action === 'edit') {
+        <div class="create-modal" [id]="state.entity" (click)="$event.stopPropagation()">
+          <h1>
+            {{ state.action === 'create' ? 'Novo' : 'Editar' }}
+            {{ state.entity === 'device' ? 'Dispositivo' : (state.entity === 'collaborator' ? 'Colaborador' : 'Organização') }}
+          </h1>
+
+          <div class="create-inputs">
+            @if (state.entity === 'device') {
+              <div class="c-input">
+                <label for="model">Modelo:</label>
+                <input type="text" id="model" [(ngModel)]="deviceForm.model" placeholder="Digite o modelo do dispositivo...">
+              </div>
+              <div class="c-input">
+                <label for="assetTag">Etiqueta do Ativo:</label>
+                <input type="text" id="assetTag" [(ngModel)]="deviceForm.assetTag" placeholder="Digite a etiqueta do ativo do dispositivo...">
+              </div>
+            }
+
+            @if (state.entity === 'collaborator') {
+              <div class="c-input">
+                <label for="fullName">Nome:</label>
+                <input type="text" id="fullName" [(ngModel)]="collaboratorForm.fullName" placeholder="Digite o nome completo...">
+              </div>
+              <div class="c-input">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" [(ngModel)]="collaboratorForm.email" placeholder="Digite o e-mail...">
+              </div>
+              @if (state.action === 'create') {
+                <div class="c-input">
+                  <label for="password">Senha:</label>
+                  <input type="password" id="password" [(ngModel)]="collaboratorForm.password" placeholder="Digite a senha...">
+                </div>
+              }
+              @if (currentUser()?.email !== editingCollaboratorEmail) {
+                <div class="c-input">
+                  <h3>Nível de Acesso:</h3>
+                  <div class="radio-group">
+                    <label class="custom-radio">
+                      <input
+                        type="radio"
+                        name="accessLevel"
+                        value="OPERATOR"
+                        [(ngModel)]="collaboratorForm.accessLevel"
+                      />
+                      <span class="radio-mark"></span>
+                      <span class="label-text">Operador</span>
+                    </label>
+                    <label class="custom-radio">
+                      <input
+                        type="radio"
+                        name="accessLevel"
+                        value="MANAGER"
+                        [(ngModel)]="collaboratorForm.accessLevel"
+                      />
+                      <span class="radio-mark"></span>
+                      <span class="label-text">Gerente</span>
+                    </label>
+                  </div>
+                </div>
+              }
+            }
+
+            @if (state.entity === 'organization') {
+              <div class="c-input">
+                <label for="corporateName">Nome da Empresa:</label>
+                <input type="text" id="corporateName" [(ngModel)]="organizationForm.corporateName" placeholder="Digite o nome da empresa...">
+              </div>
+              <div class="c-input">
+                <label for="registrationCode">CNPJ:</label>
+                <input type="text" id="registrationCode" [(ngModel)]="organizationForm.registrationCode" placeholder="Digite o CNPJ...">
+              </div>
+            }
+          </div>
+
+          <div class="action-buttons">
+            <button type="button" id="create-btn" (click)="confirmAction()">
+              {{ state.action === 'create' ? 'Criar' : 'Salvar' }}
+            </button>
+            <button (click)="closeModal()" id="close-btn">Voltar</button>
+          </div>
+        </div>
+      } @else {
+        <div class="create-modal delete" [id]="state.entity" (click)="$event.stopPropagation()">
+          <div class="delete-text">
+            <h1>
+              Tem certeza que deseja excluir
+              {{ state.entity === 'device' ? 'este dispositivo' : (state.entity === 'collaborator' ? 'este colaborador' : 'esta organização') }}?
+            </h1>
+          </div>
+          <div class="action-buttons">
+            <button type="button" id="create-btn" (click)="confirmAction()">Excluir</button>
+            <button (click)="closeModal()" id="close-btn">Voltar</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </main>

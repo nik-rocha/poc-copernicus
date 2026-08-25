@@ -2,7 +2,7 @@ package com.example.copernicus.api.dto
 
 import jakarta.validation.constraints.NotBlank
 
-data class RegisterRequest(
+data class CollaboratorCreateRequest(
     @field:NotBlank(message = "O nome do colaborador não pode estar vazio.")
     val fullName: String,
     @field:NotBlank(message = "O e-mail do colaborador não pode estar vazio.")
@@ -11,9 +11,5 @@ data class RegisterRequest(
     val password: String,
     @field:NotBlank(message = "O nível de acesso do colaborador não pode estar vazio.")
     val accessLevel: String,
-    val organizationId: Long? = null,
-    val corporateName: String? = null,
-    val registrationCode: String? = null,
-    val hasOrganization: Boolean? = false
-) {
-}
+    val organizationId: Long
+)

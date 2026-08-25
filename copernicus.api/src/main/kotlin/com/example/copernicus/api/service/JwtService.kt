@@ -1,8 +1,14 @@
 package com.example.copernicus.api.service
 
+import com.example.copernicus.api.exception.ForbiddenActionException
 import io.jsonwebtoken.Claims
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.MalformedJwtException
+import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.security.Keys
+import io.jsonwebtoken.security.SignatureException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -42,10 +48,24 @@ class JwtService(
     }
 
     private fun getClaims(token: String): Claims {
-        return Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .payload as Claims
+        return try {
+            Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .payload
+        } catch (e: ExpiredJwtException) {
+            throw ForbiddenActionException("Token JWT expirado.")
+        } catch (e: SignatureException) {
+            throw ForbiddenActionException("Assinatura do token JWT inválida.")
+        } catch (e: MalformedJwtException) {
+            throw ForbiddenActionException("Token JWT malformado.")
+        } catch (e: UnsupportedJwtException) {
+            throw ForbiddenActionException("Token JWT não suportado.")
+        } catch (e: IllegalArgumentException) {
+            throw ForbiddenActionException("Token JWT ausente ou inválido.")
+        } catch (e: JwtException) {
+            throw ForbiddenActionException("Falha na validação do token JWT.")
+        }
     }
 }

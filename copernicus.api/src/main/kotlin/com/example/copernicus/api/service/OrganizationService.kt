@@ -1,13 +1,13 @@
 package com.example.copernicus.api.service
 
+import com.example.copernicus.api.exception.ForbiddenActionException
+import com.example.copernicus.api.exception.ResourceNotFoundException
 import com.example.copernicus.api.model.Collaborator
-import com.example.copernicus.api.model.Device
 import com.example.copernicus.api.model.Organization
 import com.example.copernicus.api.repository.CollaboratorRepository
 import com.example.copernicus.api.repository.OrganizationRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.context.SecurityContextHolder
-import java.nio.file.AccessDeniedException
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,10 +19,10 @@ class OrganizationService(
     private fun getLoggedCollaborator(): Collaborator {
         val email = SecurityContextHolder.getContext().authentication?.name
         val loggedUser = collaboratorRepository.findByEmail(email)
-            ?: throw RuntimeException("Usuário logado não encontrado.")
+            ?: throw ResourceNotFoundException("Usuário logado não encontrado.")
 
         if (loggedUser.organization == null) {
-            throw AccessDeniedException("Você precisa criar uma organização antes de acessar este recurso.")
+            throw ForbiddenActionException("Você precisa criar uma organização antes de acessar este recurso.")
         }
 
         return loggedUser
@@ -31,10 +31,10 @@ class OrganizationService(
     fun create(organization: Organization): Organization {
         val email = SecurityContextHolder.getContext().authentication?.name
         val loggedUser = collaboratorRepository.findByEmail(email)
-            ?: throw RuntimeException("Usuário logado não encontrado.")
+            ?: throw ResourceNotFoundException("Usuário logado não encontrado.")
 
         if (loggedUser.organization != null && loggedUser.accessLevel == "OPERATOR") {
-            throw AccessDeniedException("Operadores não podem criar outras organizações.")
+            throw ForbiddenActionException("Operadores não podem criar outras organizações.")
         }
 
         val newOrganization = repository.save(
@@ -55,20 +55,26 @@ class OrganizationService(
     fun findAll(): List<Organization> {
         val loggedUser = getLoggedCollaborator()
 
-        return if (loggedUser.accessLevel == "MANAGER") {
+        return if (loggedUser.accessLevel.equals("MANAGER", ignoreCase = true)) {
             repository.findAll()
         } else {
-            listOf(loggedUser.organization!!)
+            val org = loggedUser.organization
+                ?: throw ForbiddenActionException("Você não possui uma organização vinculada.")
+            listOf(org)
         }
+    }
+
+    fun findAllOnlogin(): List<Organization> {
+        return repository.findAll()
     }
 
     fun update(id: Long, organization: Organization): Organization {
         val loggedUser = getLoggedCollaborator()
         val organizationDB = repository.findById(id)
-            .orElseThrow { RuntimeException("A organização não foi encontrada: $id.") }
+            .orElseThrow { ResourceNotFoundException("A organização não foi encontrada: $id.") }
 
         if (loggedUser.accessLevel.equals("OPERATOR", ignoreCase = true)) {
-            throw AccessDeniedException("Operadores não podem editar outras organizações.")
+            throw ForbiddenActionException("Operadores não podem editar outras organizações.")
         }
 
         return repository.save(
@@ -82,10 +88,10 @@ class OrganizationService(
     fun findById(id: Long): Organization {
         val loggedUser = getLoggedCollaborator()
         val organization = repository.findByIdOrNull(id)
-            ?: throw RuntimeException("Organização com ID $id não encontrada.")
+            ?: throw ResourceNotFoundException("Organização com ID $id não encontrada.")
 
         if (loggedUser.accessLevel == "OPERATOR" && loggedUser.organization?.idOrganization != id) {
-            throw AccessDeniedException("Você só pode visualizar a sua própria organização.")
+            throw ForbiddenActionException("Você só pode visualizar a sua própria organização.")
         }
 
         return organization
@@ -94,10 +100,10 @@ class OrganizationService(
     fun delete(id: Long) {
         val loggedUser = getLoggedCollaborator()
         val organizationDB = repository.findById(id)
-            .orElseThrow { RuntimeException("A organização não foi encontrada: $id.") }
+            .orElseThrow { ResourceNotFoundException("A organização não foi encontrada: $id.") }
 
         if (loggedUser.accessLevel.equals("OPERATOR", ignoreCase = true)) {
-            throw AccessDeniedException("Operadores não podem remover outras organizações.")
+            throw ForbiddenActionException("Operadores não podem remover outras organizações.")
         }
 
         repository.delete(organizationDB)

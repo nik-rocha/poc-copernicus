@@ -31,6 +31,7 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 auth.requestMatchers("/auth/**").permitAll()
+                auth.requestMatchers(org.springframework.http.HttpMethod.GET, "/organizations/all").permitAll()
                 auth.anyRequest().authenticated()
             }
             .authenticationProvider(authenticationProvider())
