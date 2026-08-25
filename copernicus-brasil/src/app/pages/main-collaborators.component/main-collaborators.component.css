@@ -334,6 +334,25 @@ main {
         justify-content: center;
         flex-direction: column;
 
+        .see-pass {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+
+          #password {
+            width: 90%;
+          }
+
+          button {
+            font-size: 3.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+          }
+        }
+
         label {
           font-weight: 600;
           margin-bottom: 0.5rem;

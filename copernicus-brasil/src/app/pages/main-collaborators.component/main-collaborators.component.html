@@ -84,14 +84,19 @@
         </div>
       </div>
       @if (orgView === 'devices') {
-        @if (!devices().length) {
+        @if (!allDevices().length) {
+          <div class="empty-data" id="devices">
+            <h1>Não existem dispositivos cadastrados no sistema.</h1>
+            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
+          </div>
+        } @else if (!devices().length) {
           <div class="empty-data" id="devices">
             <h1>Não existem dispositivos nessa organização.</h1>
             <fa-icon [icon]="faFileCircleXmark"></fa-icon>
           </div>
         } @else if (filteredDevices().length == 0) {
-            <div class="empty-data" id="devices">
-              <h1>Nenhum dispositivo foi encontrado.</h1>
+          <div class="empty-data" id="devices">
+            <h1>Nenhum dispositivo foi encontrado.</h1>
           </div>
         } @else {
           <div class="right-center">
@@ -119,16 +124,21 @@
           </div>
         }
       } @else if (orgView === 'collaborators') {
-        @if (!collaborators().length) {
-          <div class="empty-data" id="devices">
-            <h1>Não existem colaboradores nessa organização.</h1>
-            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
-          </div>
-        } @else if (filteredCollaborators().length == 0) {
-            <div class="empty-data" id="devices">
-              <h1>Nenhum colaborador foi encontrado.</h1>
-          </div>
-        } @else {
+        @if (!allCollaborators().length) {
+        <div class="empty-data" id="devices">
+          <h1>Não existem colaboradores cadastrados no sistema.</h1>
+          <fa-icon [icon]="faFileCircleXmark"></fa-icon>
+        </div>
+      } @else if (!collaborators().length) {
+        <div class="empty-data" id="devices">
+          <h1>Não existem colaboradores nessa organização.</h1>
+          <fa-icon [icon]="faFileCircleXmark"></fa-icon>
+        </div>
+      } @else if (filteredCollaborators().length == 0) {
+        <div class="empty-data" id="devices">
+          <h1>Nenhum colaborador foi encontrado.</h1>
+        </div>
+      } @else {
           <div class="right-center">
             @for (collaborator of filteredCollaborators(); track collaborator.idCollaborator) {
               <div class="data-card" id="card" [attr.data-id]="'collaborator-' + collaborator.idCollaborator">
@@ -214,29 +224,42 @@
 
           <div class="create-inputs">
             @if (state.entity === 'device') {
+              @if (errorMessage()) {
+                <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 100%; text-align: center;" class="error-message">
+                  {{ errorMessage() }}
+                </p>
+              }
               <div class="c-input">
                 <label for="model">Modelo:</label>
-                <input type="text" id="model" [(ngModel)]="deviceForm.model" placeholder="Digite o modelo do dispositivo...">
+                <input type="text" id="model" [(ngModel)]="deviceForm.model" placeholder="Digite o modelo do dispositivo..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
               </div>
               <div class="c-input">
                 <label for="assetTag">Etiqueta do Ativo:</label>
-                <input type="text" id="assetTag" [(ngModel)]="deviceForm.assetTag" placeholder="Digite a etiqueta do ativo do dispositivo...">
+                <input type="text" id="assetTag" [(ngModel)]="deviceForm.assetTag" placeholder="Digite a etiqueta do ativo do dispositivo..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
               </div>
             }
 
             @if (state.entity === 'collaborator') {
+              @if (errorMessage()) {
+                <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 100%; text-align: center;" class="error-message">
+                  {{ errorMessage() }}
+                </p>
+              }
               <div class="c-input">
                 <label for="fullName">Nome:</label>
-                <input type="text" id="fullName" [(ngModel)]="collaboratorForm.fullName" placeholder="Digite o nome completo...">
+                <input type="text" id="fullName" [(ngModel)]="collaboratorForm.fullName" placeholder="Digite o nome completo..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
               </div>
               <div class="c-input">
                 <label for="email">E-mail:</label>
-                <input type="email" id="email" [(ngModel)]="collaboratorForm.email" placeholder="Digite o e-mail...">
+                <input type="email" id="email" [(ngModel)]="collaboratorForm.email" placeholder="Digite o e-mail..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
               </div>
               @if (state.action === 'create') {
                 <div class="c-input">
                   <label for="password">Senha:</label>
-                  <input type="password" id="password" [(ngModel)]="collaboratorForm.password" placeholder="Digite a senha...">
+                  <div class="see-pass">
+                    <input [type]="showPass() ? 'text' : 'password'" id="password" [(ngModel)]="collaboratorForm.password" placeholder="Digite a senha..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+                  <button><fa-icon [icon]="showPass() ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
+                </div>
                 </div>
               }
               @if (currentUser()?.email !== editingCollaboratorEmail) {
@@ -249,6 +272,8 @@
                         name="accessLevel"
                         value="OPERATOR"
                         [(ngModel)]="collaboratorForm.accessLevel"
+                        [class.is-invalid]="errorMessage()"
+                        (input)="errorMessage.set('')"
                       />
                       <span class="radio-mark"></span>
                       <span class="label-text">Operador</span>
@@ -259,6 +284,8 @@
                         name="accessLevel"
                         value="MANAGER"
                         [(ngModel)]="collaboratorForm.accessLevel"
+                        [class.is-invalid]="errorMessage()"
+                        (input)="errorMessage.set('')"
                       />
                       <span class="radio-mark"></span>
                       <span class="label-text">Gerente</span>
@@ -269,13 +296,18 @@
             }
 
             @if (state.entity === 'organization') {
+              @if (errorMessage()) {
+                <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 100%; text-align: center;" class="error-message">
+                  {{ errorMessage() }}
+                </p>
+              }
               <div class="c-input">
                 <label for="corporateName">Nome da Empresa:</label>
-                <input type="text" id="corporateName" [(ngModel)]="organizationForm.corporateName" placeholder="Digite o nome da empresa...">
+                <input type="text" id="corporateName" [(ngModel)]="organizationForm.corporateName" placeholder="Digite o nome da empresa..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
               </div>
               <div class="c-input">
                 <label for="registrationCode">CNPJ:</label>
-                <input type="text" id="registrationCode" [(ngModel)]="organizationForm.registrationCode" placeholder="Digite o CNPJ...">
+                <input type="text" id="registrationCode" [(ngModel)]="organizationForm.registrationCode" placeholder="Digite o CNPJ..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
               </div>
             }
           </div>

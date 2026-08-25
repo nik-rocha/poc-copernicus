@@ -5,7 +5,7 @@ import { OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { faHardDrive, faUserGroup, faBuilding, faRightToBracket, faGear, faCirclePlus, faFileCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faHardDrive, faUserGroup, faBuilding, faRightToBracket, faGear, faCirclePlus, faFileCircleXmark, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { CollaboratorService } from '../../services/collaborator.service';
 import { DeviceService } from '../../services/device.service';
 import { Router } from '@angular/router';
@@ -50,6 +50,7 @@ export class MainCollaboratorsComponent implements OnInit {
   modalTarget = signal<Collaborator | Device | Organization | null>(null);
   editingCollaboratorEmail: string | null = null;
   errorMessage = signal('');
+  showPass = signal(false);
 
   collaboratorForm: Partial<Collaborator> & { organizationId?: number } = {
     fullName: '', email: '', password: '', accessLevel: 'OPERATOR'
@@ -69,7 +70,7 @@ export class MainCollaboratorsComponent implements OnInit {
       return this.allCollaborators().find(c => c.email === userAccessLevel) || null;
     } catch (e: any) {
       const message = e.response?.data?.message || 'Erro ao decodificar o token para conseguir o usuário atual.';
-      alert(message)
+      this.errorMessage.set(message)
       return null;
     }
   });
@@ -136,6 +137,8 @@ export class MainCollaboratorsComponent implements OnInit {
   faGear = faGear
   faCirclePlus = faCirclePlus
   faFileCircleXmark = faFileCircleXmark
+  faEye = faEye
+  faEyeSlash = faEyeSlash
 
   private loadUserAccessLevel(): void {
     const token = localStorage.getItem('token');
@@ -156,7 +159,7 @@ export class MainCollaboratorsComponent implements OnInit {
 
       } catch (e:any) {
         const message = e.response?.data?.message || 'Erro ao ler as permissões do token.';
-        alert(message)
+        this.errorMessage.set(message)
       }
     }
   }
@@ -189,7 +192,7 @@ export class MainCollaboratorsComponent implements OnInit {
 
     } catch (e: any) {
       const message = e.response?.data?.message || 'Erro ao carregar os dados.';
-      alert(message)
+      this.errorMessage.set(message)
     } finally {
       this.isLoading.set(false);
     }
@@ -311,7 +314,7 @@ async confirmAction(): Promise<void> {
 
   } catch (e: any) {
     const message = e.response?.data?.message || 'Erro ao processar a ação.';
-    alert(message);
+    this.errorMessage.set(message);
   }
 }
 
@@ -344,5 +347,9 @@ async confirmAction(): Promise<void> {
 
   resetOrg(): void {
     this.selectedOrganization.set(null);
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPass.set(!this.showPass());
   }
 }

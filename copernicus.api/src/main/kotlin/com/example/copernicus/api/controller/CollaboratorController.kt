@@ -5,6 +5,7 @@ import com.example.copernicus.api.dto.CollaboratorResponse
 import com.example.copernicus.api.dto.toResponse
 import com.example.copernicus.api.model.Collaborator
 import com.example.copernicus.api.service.CollaboratorService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 class CollaboratorController(private val service: CollaboratorService) {
 
     @PostMapping
-    fun create(@RequestBody request: CollaboratorCreateRequest): ResponseEntity<CollaboratorResponse> =
+    fun create(@Valid @RequestBody request: CollaboratorCreateRequest): ResponseEntity<CollaboratorResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(service.create(request).toResponse())
 
     @GetMapping

@@ -48,7 +48,7 @@ class CollaboratorService(
             throw ConflictException("E-mail já cadastrado no sistema.")
         }
 
-        val organization = organizationRepository.findByIdOrNull(request.organizationId)
+        val organization = organizationRepository.findByIdOrNull(request.organizationId!!)
             ?: throw ResourceNotFoundException("Organização não encontrada.")
 
         val newCollaborator = Collaborator(

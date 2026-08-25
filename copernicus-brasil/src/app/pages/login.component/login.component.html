@@ -8,11 +8,11 @@
       <img src="/logo_black.png" alt="Copernicus Brasil">
       <h1>Bem-vindo!</h1>
       @if (errorMessage()) {
-        <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 60%; text-align: center" class="error-message">
+        <p id="error-p" class="error-message">
           {{ errorMessage() }}
         </p>
       } @else if (successMessage()) {
-        <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #0a9e22; font-weight: 600; width: 60%; text-align: center" class="success-message">
+        <p id="success-p" class="success-message">
           {{ successMessage() }}
         </p>
       }
@@ -38,26 +38,28 @@
       <img src="/logo_black.png" alt="Copernicus Brasil">
       @if (errorMessage()) {
         <h1 style="margin-bottom: 2rem;">Crie sua Conta</h1>
-        <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 60%; text-align: center;" class="error-message">
+        <p id="error-p" class="error-message">
           {{ errorMessage() }}
         </p>
       } @else {
         <h1>Crie sua Conta</h1>
       }
-      <div class="input-group">
-        <div class="name-input" id="input">
-          <label for="name">Nome completo:</label>
-          <input type="text" [(ngModel)]="formData.fullName" name="name" id="name" placeholder="Digite o seu nome..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
-        </div>
-        <div class="email-input" id="input">
-          <label for="email">E-mail:</label>
-          <input type="text" [(ngModel)]="formData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
-        </div>
-        <div class="password-input" id="input">
-          <label for="pass">Senha:</label>
-          <div class="see-pass">
-            <input [type]="showPass() ? 'text' : 'password'" name="pass" id="pass" [(ngModel)]="formData.password" placeholder="Digite sua senha..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
-            <button><fa-icon [icon]="showPass() ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
+        <div class="input-group">
+          <div class="name-input" id="input">
+            <label for="name">Nome completo:</label>
+            <input type="text" [(ngModel)]="formData.fullName" name="name" id="name" placeholder="Digite o seu nome..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+          </div>
+          <div class="input-row">
+            <div class="email-input" id="input">
+            <label for="email">E-mail:</label>
+            <input type="text" [(ngModel)]="formData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+          </div>
+          <div class="password-input" id="input">
+            <label for="pass">Senha:</label>
+            <div class="see-pass">
+              <input [type]="showPass() ? 'text' : 'password'" name="pass" id="pass" [(ngModel)]="formData.password" placeholder="Digite sua senha..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+              <button><fa-icon [icon]="showPass() ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
+            </div>
           </div>
         </div>
         <div class="radio-group">
@@ -94,6 +96,11 @@
       <div class="login-container" id="login">
       <img src="/logo_black.png" alt="Copernicus Brasil">
       <h1>Qual sua Organização?</h1>
+      @if (errorMessage()) {
+        <p id="error-p" class="error-message">
+          {{ errorMessage() }}
+        </p>
+      }
       <div class="input-group">
         <div class="radio-group">
           <label class="custom-radio">
