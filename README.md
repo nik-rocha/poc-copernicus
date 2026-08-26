@@ -89,8 +89,7 @@ Para instalar o sistema, siga os seguintes passos:
 
 ```spring.datasource.username=SEU_USUARIO```
 
-```spring.datasource.password=SUA_SENHA
-​```
+```spring.datasource.password=SUA_SENHA```
 
 O banco `copernicus_db` será criado automaticamente na primeira execução.
 
