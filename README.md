@@ -1,4 +1,4 @@
-<h1 align="center"> 🌌 Copernicus Brasil - Sistema de Gerenciamento de T.I. 🌌 </h1>
+<h1 align="center"> 🌌 Copernicus Brasil - Sistema de Gerenciamento 🌌 </h1>
 
 **Nota:** este projeto utiliza MySQL como banco de dados, portanto não há políticas RLS (Row-Level Security) do PostgreSQL. As regras de autorização (MANAGER/OPERATOR) são implementadas na camada de serviço (`service/`) da aplicação.
 
