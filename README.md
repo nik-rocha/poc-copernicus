@@ -32,7 +32,7 @@ Desenvolvivo como uma forma de desafio em Kotlin.
 * Instalação e Iniciação
 * Se localizando
 * Primeiro Acesso
-* Regras de Negócio
+* Regras de Acesso
 * Autor
 
 ## 🧾 Descrição do Projeto
