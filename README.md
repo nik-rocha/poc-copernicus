@@ -170,5 +170,5 @@ Como o sistema não vem com dados pré-cadastrados, crie sua primeira conta pela
 
 ## 👨‍💼 Autor
 
-| [<img src="https://avatars.githubusercontent.com/u/117852880?v=4" width=115><br><sub>Nicollas Rocha</sub>](https://github.com/knboo320) |
+| [<img src="https://avatars.githubusercontent.com/u/117852880?v=4" width=115><br><sub>Nicollas Rocha</sub>](https://github.com/nik-rocha) |
 | :---: |
