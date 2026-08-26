@@ -83,10 +83,13 @@ Para instalar o sistema, siga os seguintes passos:
 
 2. Antes de rodar o backend, edite o arquivo `src/main/resources/application.properties` com suas credenciais do MySQL:
 
-​```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/copernicus_db
-spring.datasource.username=SEU_USUARIO
-spring.datasource.password=SUA_SENHA
+​```properties```
+
+```spring.datasource.url=jdbc:mysql://localhost:3306/copernicus_db```
+
+```spring.datasource.username=SEU_USUARIO```
+
+```spring.datasource.password=SUA_SENHA
 ​```
 
 O banco `copernicus_db` será criado automaticamente na primeira execução.
