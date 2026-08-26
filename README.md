@@ -33,7 +33,6 @@ Desenvolvivo como uma forma de desafio em Kotlin.
 * Se localizando
 * Primeiro Acesso
 * Regras de Acesso
-* Autor
 
 ## 🧾 Descrição do Projeto
 
