@@ -5,6 +5,6 @@ export interface RegisterUserRequest {
   accessLevel: string;
   hasOrganization: boolean;
   corporateName?: string;
-  registrationCode?: string; // CNPJ aqui
+  registrationCode?: string;
   organizationId?: number | null;
 }

@@ -1,5 +1,9 @@
 <main>
-  <nav class="left-navbar">
+  <nav class="left-navbar" [class.opened-nav]="openedNav">
+    <button class="navigate-org-devices" (click)="toggleNav()" id="org-return">
+      <fa-icon [icon]="faBars"></fa-icon>
+      <p id="option-title">Fechar</p>
+    </button>
     <div class="nav-top">
       <img src="/logo_white.png" alt="" />
       <div id="white-div"></div>
@@ -13,25 +17,34 @@
             Dispositivos
           }
         </h1>
-        <h2> @if (selectedOrganization()) {
+        <h2>
+          @if (selectedOrganization()) {
             {{ selectedOrganization()?.corporateName }}
           } @else {
             Vendo tudo
           }
         </h2>
-        <button class="return-org" (click)="resetOrg()" [style.display]="(!isManager() || selectedOrganization() == null) ? 'none' : 'flex'">
+        <button
+          class="return-org"
+          (click)="resetOrg(); toggleNav()"
+          [style.display]="!isManager() || selectedOrganization() == null ? 'none' : 'flex'"
+        >
           <fa-icon [icon]="faRightToBracket"></fa-icon>
           <p id="option-title">Sair da organização</p>
         </button>
       </div>
       <div class="navigate-org-options">
-        <button class="navigate-org-devices" (click)="changeView('devices')" id="org-option">
+        <button
+          class="navigate-org-devices"
+          (click)="changeView('devices'); toggleNav()"
+          id="org-option"
+        >
           <fa-icon [icon]="faHardDrive"></fa-icon>
           <p id="option-title">Dispositivos</p>
         </button>
         <button
           class="navigate-org-collaborators"
-          (click)="changeView('collaborators')"
+          (click)="changeView('collaborators'); toggleNav()"
           id="org-option"
         >
           <fa-icon [icon]="faUserGroup"></fa-icon>
@@ -39,7 +52,7 @@
         </button>
         <button
           class="navigate-org-organizations"
-          (click)="changeView('organizations')"
+          (click)="changeView('organizations'); toggleNav()"
           [style.display]="!isManager() ? 'none' : 'flex'"
           id="org-option"
         >
@@ -61,7 +74,10 @@
   <div class="right-main">
     <div class="right-main-container">
       <div class="right-top">
-        <div class="greetings-text">
+        <button class="open-nav" (click)="toggleNav()">
+          <fa-icon [icon]="faBars"></fa-icon>
+        </button>
+        <div class="greetings-text animate__animated animate__fadeInDown">
           <h1>
             @if (orgView === 'organizations') {
               Organizações
@@ -74,11 +90,25 @@
           <h2>Logado como {{ currentUser()?.fullName }}</h2>
         </div>
         <div class="search-add">
-          <input type="text" placeholder="Pesquisar..." [ngModel]="searchTerm()" (ngModelChange)="onSearchChange($event)"/>
-          <button [style.display]="(!isManager() && orgView !== 'devices') ? 'none' : 'flex'" (click)="openModal(
-                orgView === 'devices' ? 'device' : (orgView === 'collaborators' ? 'collaborator' : 'organization'),
+          <input
+            type="text"
+            placeholder="Pesquisar..."
+            [ngModel]="searchTerm()"
+            (ngModelChange)="onSearchChange($event)"
+          />
+          <button
+            [style.display]="!isManager() && orgView !== 'devices' ? 'none' : 'flex'"
+            (click)="
+              openModal(
+                orgView === 'devices'
+                  ? 'device'
+                  : orgView === 'collaborators'
+                    ? 'collaborator'
+                    : 'organization',
                 'create'
-              )">
+              )
+            "
+          >
             <fa-icon [icon]="faCirclePlus"></fa-icon>
           </button>
         </div>
@@ -97,9 +127,10 @@
         } @else if (filteredDevices().length == 0) {
           <div class="empty-data" id="devices">
             <h1>Nenhum dispositivo foi encontrado.</h1>
+            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
           </div>
         } @else {
-          <div class="right-center">
+          <div class="right-center animate__animated animate__fadeInUp">
             @for (device of filteredDevices(); track device.idDevice) {
               <div class="data-card" id="card" [attr.data-id]="'device-' + device.idDevice">
                 <div class="card-center">
@@ -115,8 +146,20 @@
                 <div class="card-bottom">
                   <div id="black" [style.display]="!isManager() ? 'none' : 'flex'"></div>
                   <div class="options-buttons" [style.display]="!isManager() ? 'none' : 'flex'">
-                    <button class="btn-option" id="edit-btn" (click)="$event.stopPropagation(); openModal('device', 'edit', device)">Editar</button>
-                    <button class="btn-option" id="delete-btn" (click)="$event.stopPropagation(); openModal('device', 'delete', device)">Excluir</button>
+                    <button
+                      class="btn-option"
+                      id="edit-btn"
+                      (click)="$event.stopPropagation(); openModal('device', 'edit', device)"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      class="btn-option"
+                      id="delete-btn"
+                      (click)="$event.stopPropagation(); openModal('device', 'delete', device)"
+                    >
+                      Excluir
+                    </button>
                   </div>
                 </div>
               </div>
@@ -125,23 +168,28 @@
         }
       } @else if (orgView === 'collaborators') {
         @if (!allCollaborators().length) {
-        <div class="empty-data" id="devices">
-          <h1>Não existem colaboradores cadastrados no sistema.</h1>
-          <fa-icon [icon]="faFileCircleXmark"></fa-icon>
-        </div>
-      } @else if (!collaborators().length) {
-        <div class="empty-data" id="devices">
-          <h1>Não existem colaboradores nessa organização.</h1>
-          <fa-icon [icon]="faFileCircleXmark"></fa-icon>
-        </div>
-      } @else if (filteredCollaborators().length == 0) {
-        <div class="empty-data" id="devices">
-          <h1>Nenhum colaborador foi encontrado.</h1>
-        </div>
-      } @else {
-          <div class="right-center">
+          <div class="empty-data" id="devices">
+            <h1>Não existem colaboradores cadastrados no sistema.</h1>
+            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
+          </div>
+        } @else if (!collaborators().length) {
+          <div class="empty-data" id="devices">
+            <h1>Não existem colaboradores nessa organização.</h1>
+            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
+          </div>
+        } @else if (filteredCollaborators().length == 0) {
+          <div class="empty-data" id="devices">
+            <h1>Nenhum colaborador foi encontrado.</h1>
+            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
+          </div>
+        } @else {
+          <div class="right-center animate__animated animate__fadeInUp">
             @for (collaborator of filteredCollaborators(); track collaborator.idCollaborator) {
-              <div class="data-card" id="card" [attr.data-id]="'collaborator-' + collaborator.idCollaborator">
+              <div
+                class="data-card"
+                id="card"
+                [attr.data-id]="'collaborator-' + collaborator.idCollaborator"
+              >
                 <div class="card-center">
                   <div class="info-display">
                     <p id="info-label">Nome:</p>
@@ -167,8 +215,27 @@
                 <div class="card-bottom">
                   <div id="black" [style.display]="!isManager() ? 'none' : 'flex'"></div>
                   <div class="options-buttons" [style.display]="!isManager() ? 'none' : 'flex'">
-                    <button class="btn-option" id="edit-btn" (click)="$event.stopPropagation(); openModal('collaborator', 'edit', collaborator)">Editar</button>
-                    <button class="btn-option" id="delete-btn" (click)="$event.stopPropagation(); openModal('collaborator', 'delete', collaborator)" [style.display]="currentUser()?.fullName == collaborator.fullName ? 'none' : 'flex'">Remover</button>
+                    <button
+                      class="btn-option"
+                      id="edit-btn"
+                      (click)="
+                        $event.stopPropagation(); openModal('collaborator', 'edit', collaborator)
+                      "
+                    >
+                      Editar
+                    </button>
+                    <button
+                      class="btn-option"
+                      id="delete-btn"
+                      (click)="
+                        $event.stopPropagation(); openModal('collaborator', 'delete', collaborator)
+                      "
+                      [style.display]="
+                        currentUser()?.fullName == collaborator.fullName ? 'none' : 'flex'
+                      "
+                    >
+                      Excluir
+                    </button>
                   </div>
                 </div>
               </div>
@@ -176,90 +243,182 @@
           </div>
         }
       } @else if (orgView === 'organizations') {
-          @if (!organizations().length) {
-            <div class="empty-data" id="devices">
-              <h1>Não existem organizações no sistema.</h1>
-              <fa-icon [icon]="faFileCircleXmark"></fa-icon>
-            </div>
-          } @else if (filteredOrganizations().length == 0) {
-            <div class="empty-data" id="devices">
-              <h1>Nenhuma organização foi encontrada.</h1>
+        @if (!organizations().length) {
+          <div class="empty-data" id="devices">
+            <h1>Não existem organizações no sistema.</h1>
+            <fa-icon [icon]="faFileCircleXmark"></fa-icon>
           </div>
-          } @else {
-            <div class="right-center">
-              @for (organization of filteredOrganizations(); track organization.idOrganization) {
-                <div class="data-card" id="card" (click)="selectOrganization(organization)" [attr.data-id]="'organization-' + organization.idOrganization">
-                  <div class="card-center">
-                    <div class="info-display">
-                      <h3 id="info-main">{{ organization.corporateName }}</h3>
-                    </div>
-                    <div class="info-display">
-                      <p id="info-label">CNPJ:</p>
-                      <h3 id="info-main">{{ organization.registrationCode }}</h3>
-                    </div>
+        } @else if (filteredOrganizations().length == 0) {
+          <div class="empty-data" id="devices">
+            <h1>Nenhuma organização foi encontrada.</h1>
+          </div>
+        } @else {
+          <div class="right-center animate__animated animate__fadeInUp">
+            @for (organization of filteredOrganizations(); track organization.idOrganization) {
+              <div
+                class="data-card-org"
+                id="card"
+                (click)="selectOrganization(organization)"
+                [attr.data-id]="'organization-' + organization.idOrganization"
+              >
+                <div class="card-center">
+                  <div class="info-display">
+                    <h3 id="info-main">{{ organization.corporateName }}</h3>
                   </div>
-                  <div class="card-bottom">
-                    <div id="black" [style.display]="!isManager() ? 'none' : 'flex'"></div>
-                    <div class="options-buttons" [style.display]="!isManager() ? 'none' : 'flex'">
-                      <button class="btn-option" id="edit-btn" (click)="$event.stopPropagation(); openModal('organization', 'edit', organization)">Editar</button>
-                      <button class="btn-option" id="delete-btn" (click)="$event.stopPropagation(); openModal('organization', 'delete', organization)" [style.display]="currentUser()?.organizationId == organization.idOrganization ? 'none' : 'flex'">Excluir</button>
-                    </div>
+                  <div class="info-display">
+                    <p id="info-label">CNPJ:</p>
+                    <h3 id="info-main">{{ organization.registrationCode }}</h3>
                   </div>
                 </div>
-              }
-            </div>
-          }
+                <div class="card-bottom">
+                  <div id="black" [style.display]="!isManager() ? 'none' : 'flex'"></div>
+                  <div class="options-buttons" [style.display]="!isManager() ? 'none' : 'flex'">
+                    <button
+                      class="btn-option"
+                      id="edit-btn"
+                      (click)="
+                        $event.stopPropagation(); openModal('organization', 'edit', organization)
+                      "
+                    >
+                      Editar
+                    </button>
+                    <button
+                      class="btn-option"
+                      id="delete-btn"
+                      (click)="
+                        $event.stopPropagation(); openModal('organization', 'delete', organization)
+                      "
+                      [style.display]="
+                        currentUser()?.organizationId == organization.idOrganization
+                          ? 'none'
+                          : 'flex'
+                      "
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
       }
     </div>
   </div>
   @if (modalState(); as state) {
     <div class="modal-overlay" (click)="closeModal()">
-
       @if (state.action === 'create' || state.action === 'edit') {
-        <div class="create-modal" [id]="state.entity" (click)="$event.stopPropagation()">
+        <div class="create-modal animate__animated animate__slideInDown" [id]="state.entity" (click)="$event.stopPropagation()">
           <h1>
             {{ state.action === 'create' ? 'Novo' : 'Editar' }}
-            {{ state.entity === 'device' ? 'Dispositivo' : (state.entity === 'collaborator' ? 'Colaborador' : 'Organização') }}
+            {{
+              state.entity === 'device'
+                ? 'Dispositivo'
+                : state.entity === 'collaborator'
+                  ? 'Colaborador'
+                  : 'Organização'
+            }}
           </h1>
 
           <div class="create-inputs">
             @if (state.entity === 'device') {
               @if (errorMessage()) {
-                <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 100%; text-align: center;" class="error-message">
+                <p
+                  style="
+                    font-size: 2.5rem;
+                    margin-bottom: 2rem;
+                    color: #ca1616;
+                    font-weight: 600;
+                    width: 100%;
+                    text-align: center;
+                  "
+                  class="error-message"
+                >
                   {{ errorMessage() }}
                 </p>
               }
               <div class="c-input">
                 <label for="model">Modelo:</label>
-                <input type="text" id="model" [(ngModel)]="deviceForm.model" placeholder="Digite o modelo do dispositivo..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+                <input
+                  type="text"
+                  id="model"
+                  [(ngModel)]="deviceForm.model"
+                  placeholder="Digite o modelo do dispositivo..."
+                  [class.is-invalid]="errorMessage()"
+                  (input)="errorMessage.set('')"
+                />
               </div>
               <div class="c-input">
                 <label for="assetTag">Etiqueta do Ativo:</label>
-                <input type="text" id="assetTag" [(ngModel)]="deviceForm.assetTag" placeholder="Digite a etiqueta do ativo do dispositivo..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+                <input
+                  type="text"
+                  id="assetTag"
+                  [(ngModel)]="deviceForm.assetTag"
+                  placeholder="Digite a etiqueta do ativo do dispositivo..."
+                  [class.is-invalid]="errorMessage()"
+                  (input)="errorMessage.set('')"
+                />
               </div>
             }
 
             @if (state.entity === 'collaborator') {
               @if (errorMessage()) {
-                <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 100%; text-align: center;" class="error-message">
+                <p
+                  style="
+                    font-size: 2.5rem;
+                    margin-bottom: 2rem;
+                    color: #ca1616;
+                    font-weight: 600;
+                    width: 100%;
+                    text-align: center;
+                  "
+                  class="error-message"
+                >
                   {{ errorMessage() }}
                 </p>
               }
               <div class="c-input">
                 <label for="fullName">Nome:</label>
-                <input type="text" id="fullName" [(ngModel)]="collaboratorForm.fullName" placeholder="Digite o nome completo..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+                <input
+                  type="text"
+                  id="fullName"
+                  [(ngModel)]="collaboratorForm.fullName"
+                  placeholder="Digite o nome completo..."
+                  [class.is-invalid]="errorMessage()"
+                  (input)="errorMessage.set('')"
+                />
               </div>
               <div class="c-input">
                 <label for="email">E-mail:</label>
-                <input type="email" id="email" [(ngModel)]="collaboratorForm.email" placeholder="Digite o e-mail..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+                <input
+                  type="email"
+                  id="email"
+                  [(ngModel)]="collaboratorForm.email"
+                  placeholder="Digite o e-mail..."
+                  [class.is-invalid]="errorMessage()"
+                  (input)="errorMessage.set('')"
+                />
               </div>
               @if (state.action === 'create') {
                 <div class="c-input">
                   <label for="password">Senha:</label>
                   <div class="see-pass">
-                    <input [type]="showPass() ? 'text' : 'password'" id="password" [(ngModel)]="collaboratorForm.password" placeholder="Digite a senha..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
-                  <button><fa-icon [icon]="showPass() ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
-                </div>
+                    <input
+                      [type]="showPass() ? 'text' : 'password'"
+                      id="password"
+                      [(ngModel)]="collaboratorForm.password"
+                      placeholder="Digite a senha..."
+                      [class.is-invalid]="errorMessage()"
+                      (input)="errorMessage.set('')"
+                    />
+                    <button>
+                      <fa-icon
+                        [icon]="showPass() ? faEyeSlash : faEye"
+                        (click)="togglePasswordVisibility()"
+                        style="color: #000"
+                      ></fa-icon>
+                    </button>
+                  </div>
                 </div>
               }
               @if (currentUser()?.email !== editingCollaboratorEmail) {
@@ -297,17 +456,43 @@
 
             @if (state.entity === 'organization') {
               @if (errorMessage()) {
-                <p style="font-size: 2.5rem; margin-bottom: 2rem; color: #ca1616; font-weight: 600; width: 100%; text-align: center;" class="error-message">
+                <p
+                  style="
+                    font-size: 2.5rem;
+                    margin-bottom: 2rem;
+                    color: #ca1616;
+                    font-weight: 600;
+                    width: 100%;
+                    text-align: center;
+                  "
+                  class="error-message"
+                >
                   {{ errorMessage() }}
                 </p>
               }
               <div class="c-input">
                 <label for="corporateName">Nome da Empresa:</label>
-                <input type="text" id="corporateName" [(ngModel)]="organizationForm.corporateName" placeholder="Digite o nome da empresa..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+                <input
+                  type="text"
+                  id="corporateName"
+                  [(ngModel)]="organizationForm.corporateName"
+                  placeholder="Digite o nome da empresa..."
+                  [class.is-invalid]="errorMessage()"
+                  (input)="errorMessage.set('')"
+                />
               </div>
               <div class="c-input">
                 <label for="registrationCode">CNPJ:</label>
-                <input type="text" id="registrationCode" [(ngModel)]="organizationForm.registrationCode" placeholder="Digite o CNPJ..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+                <input
+                  type="text"
+                  id="registrationCode"
+                  [(ngModel)]="organizationForm.registrationCode"
+                  (ngModelChange)="onCnpjInput($event)"
+                  placeholder="Digite o CNPJ..."
+                  [class.is-invalid]="errorMessage()"
+                  (input)="errorMessage.set('')"
+                  maxlength="18"
+                />
               </div>
             }
           </div>
@@ -320,11 +505,17 @@
           </div>
         </div>
       } @else {
-        <div class="create-modal delete" [id]="state.entity" (click)="$event.stopPropagation()">
+        <div class="create-modal delete animate__animated animate__slideInDown" [id]="state.entity" (click)="$event.stopPropagation()">
           <div class="delete-text">
             <h1>
               Tem certeza que deseja excluir
-              {{ state.entity === 'device' ? 'este dispositivo' : (state.entity === 'collaborator' ? 'este colaborador' : 'esta organização') }}?
+              {{
+                state.entity === 'device'
+                  ? 'este dispositivo'
+                  : state.entity === 'collaborator'
+                    ? 'este colaborador'
+                    : 'esta organização'
+              }}?
             </h1>
           </div>
           <div class="action-buttons">

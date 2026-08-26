@@ -1,5 +1,6 @@
 package com.example.copernicus.api.service
 
+import com.example.copernicus.api.exception.ConflictException
 import com.example.copernicus.api.exception.ForbiddenActionException
 import com.example.copernicus.api.exception.ResourceNotFoundException
 import com.example.copernicus.api.model.Collaborator
@@ -26,7 +27,7 @@ class OrganizationService(
         }
 
         return loggedUser
-        }
+    }
 
     fun create(organization: Organization): Organization {
         val email = SecurityContextHolder.getContext().authentication?.name
@@ -35,6 +36,10 @@ class OrganizationService(
 
         if (loggedUser.organization != null && loggedUser.accessLevel == "OPERATOR") {
             throw ForbiddenActionException("Operadores não podem criar outras organizações.")
+        }
+
+        if (repository.findByRegistrationCode(organization.registrationCode) != null) {
+            throw ConflictException("CNPJ já cadastrado no sistema.")
         }
 
         val newOrganization = repository.save(
@@ -75,6 +80,11 @@ class OrganizationService(
 
         if (loggedUser.accessLevel.equals("OPERATOR", ignoreCase = true)) {
             throw ForbiddenActionException("Operadores não podem editar outras organizações.")
+        }
+
+        val codeOwner = repository.findByRegistrationCode(organization.registrationCode)
+        if (codeOwner != null && codeOwner.idOrganization != id) {
+            throw ConflictException("CNPJ já cadastrado no sistema.")
         }
 
         return repository.save(

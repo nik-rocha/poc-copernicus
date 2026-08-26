@@ -69,7 +69,8 @@ class DeviceService(
             ?: throw ResourceNotFoundException("O dispositivo não foi encontrado: $id.")
 
         if (loggedUser.accessLevel == "OPERATOR" &&
-            deviceDB.organization?.idOrganization != loggedUser.organization!!.idOrganization) {
+            deviceDB.organization?.idOrganization != loggedUser.organization!!.idOrganization
+        ) {
             throw ForbiddenActionException("Você só pode atualizar dispositivos da sua própria organização.")
         }
 
@@ -93,7 +94,8 @@ class DeviceService(
             ?: throw ResourceNotFoundException("Dispositivo com ID $id não encontrado.")
 
         if (loggedUser.accessLevel == "OPERATOR" &&
-            device.organization?.idOrganization != loggedUser.organization!!.idOrganization) {
+            device.organization?.idOrganization != loggedUser.organization!!.idOrganization
+        ) {
             throw ForbiddenActionException("Você não tem permissão para visualizar este dispositivo.")
         }
 
@@ -106,7 +108,8 @@ class DeviceService(
             ?: throw ResourceNotFoundException("O dispositivo não foi encontrado: $id.")
 
         if (loggedUser.accessLevel == "OPERATOR" &&
-            deviceDB.organization?.idOrganization != loggedUser.organization!!.idOrganization) {
+            deviceDB.organization?.idOrganization != loggedUser.organization!!.idOrganization
+        ) {
             throw ForbiddenActionException("Um operador pode remover apenas dispositivos da sua própria organização.")
         }
 

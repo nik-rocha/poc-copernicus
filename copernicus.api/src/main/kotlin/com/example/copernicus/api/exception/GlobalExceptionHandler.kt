@@ -37,8 +37,16 @@ class GlobalExceptionHandler {
         val causeMessage = ex.mostSpecificCause.message ?: ""
 
         val userMessage = when {
-            causeMessage.contains("duplicate key", ignoreCase = true) -> "Já existe um registro cadastrado com esses dados."
-            causeMessage.contains("foreign key", ignoreCase = true) -> "Não é possível alterar ou remover: o registro está vinculado a outros dados."
+            causeMessage.contains(
+                "duplicate key",
+                ignoreCase = true
+            ) -> "Já existe um registro cadastrado com esses dados."
+
+            causeMessage.contains(
+                "foreign key",
+                ignoreCase = true
+            ) -> "Não é possível alterar ou remover: o registro está vinculado a outros dados."
+
             else -> "Erro de integridade de dados no banco."
         }
 

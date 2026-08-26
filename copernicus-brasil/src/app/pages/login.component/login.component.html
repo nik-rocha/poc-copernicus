@@ -1,156 +1,240 @@
 <main>
   <div class="left-login">
-    <img src="/column.png" alt="Documento" class="rotating-doc">
+    <img src="/column.png" alt="Documento" class="rotating-doc" />
   </div>
   <div class="right-login">
     @if (currentLoginPage() === 'login') {
-      <div class="login-container" id="login">
-      <img src="/logo_black.png" alt="Copernicus Brasil">
-      <h1>Bem-vindo!</h1>
-      @if (errorMessage()) {
-        <p id="error-p" class="error-message">
-          {{ errorMessage() }}
-        </p>
-      } @else if (successMessage()) {
-        <p id="success-p" class="success-message">
-          {{ successMessage() }}
-        </p>
-      }
-      <div class="input-group">
-        <div class="email-input" id="input">
-          <label for="email">E-mail:</label>
-          <input type="text" [(ngModel)]="loginData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
-        </div>
-        <div class="password-input" id="input">
-          <label for="pass">Senha:</label>
-          <div class="see-pass">
-            <input [type]="showPass() ? 'text' : 'password'" [(ngModel)]="loginData.password" name="pass" id="pass" placeholder="Digite sua senha...">
-            <button><fa-icon [icon]="showPass() ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
-          </div>
-        </div>
-        <p>Não possui uma conta? <a href="#" (click)="setLoginPage('register'); resetAssets()">Clique aqui.</a></p>
-        <button type="submit" [disabled]="isLoading()" (click)="onLoginSubmit()" id="send">{{ isLoading() ? 'Entrando...' : 'Entrar' }}</button>
-      </div>
-    </div>
-    }
-    @else if (currentLoginPage() === "register") {
-      <div class="login-container" id="login">
-      <img src="/logo_black.png" alt="Copernicus Brasil">
-      @if (errorMessage()) {
-        <h1 style="margin-bottom: 2rem;">Crie sua Conta</h1>
-        <p id="error-p" class="error-message">
-          {{ errorMessage() }}
-        </p>
-      } @else {
-        <h1>Crie sua Conta</h1>
-      }
+      <div class="login-container animate__animated animate__fadeInRight" id="login">
+        <img src="/logo_black.png" alt="Copernicus Brasil" />
+        <h1>Bem-vindo!</h1>
+        @if (errorMessage()) {
+          <p id="error-p" class="error-message">
+            {{ errorMessage() }}
+          </p>
+        } @else if (successMessage()) {
+          <p id="success-p" class="success-message">
+            {{ successMessage() }}
+          </p>
+        }
         <div class="input-group">
-          <div class="name-input" id="input">
-            <label for="name">Nome completo:</label>
-            <input type="text" [(ngModel)]="formData.fullName" name="name" id="name" placeholder="Digite o seu nome..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
-          </div>
-          <div class="input-row">
-            <div class="email-input" id="input">
+          <div class="email-input" id="input">
             <label for="email">E-mail:</label>
-            <input type="text" [(ngModel)]="formData.email" name="email" id="email" placeholder="Digite o seu e-mail..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
+            <input
+              type="text"
+              [(ngModel)]="loginData.email"
+              name="email"
+              id="email"
+              placeholder="Digite o seu e-mail..."
+              [class.is-invalid]="errorMessage()"
+              (input)="errorMessage.set('')"
+            />
           </div>
           <div class="password-input" id="input">
             <label for="pass">Senha:</label>
             <div class="see-pass">
-              <input [type]="showPass() ? 'text' : 'password'" name="pass" id="pass" [(ngModel)]="formData.password" placeholder="Digite sua senha..." [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')">
-              <button><fa-icon [icon]="showPass() ? faEyeSlash : faEye" (click)="togglePasswordVisibility()" style="color: #000;"></fa-icon></button>
+              <input
+                [type]="showPass() ? 'text' : 'password'"
+                [(ngModel)]="loginData.password"
+                name="pass"
+                id="pass"
+                placeholder="Digite sua senha..."
+              />
+              <button>
+                <fa-icon
+                  [icon]="showPass() ? faEyeSlash : faEye"
+                  (click)="togglePasswordVisibility()"
+                  style="color: #000"
+                ></fa-icon>
+              </button>
             </div>
           </div>
+          <p>
+            Não possui uma conta?
+            <a href="#" (click)="setLoginPage('register'); resetAssets()">Clique aqui.</a>
+          </p>
+          <button type="submit" [disabled]="isLoading()" (click)="onLoginSubmit()" id="send">
+            {{ isLoading() ? 'Entrando...' : 'Entrar' }}
+          </button>
         </div>
-        <div class="radio-group">
-          <h2>Nível de Acesso:</h2>
-          <label class="custom-radio">
-            <input
-              type="radio"
-              name="accessLevel"
-              value="OPERATOR"
-              [(ngModel)]="formData.accessLevel"
-              [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')"
-            />
-            <span class="radio-mark"></span>
-            <span class="label-text">Operador</span>
-          </label>
-          <label class="custom-radio">
-            <input
-              type="radio"
-              name="accessLevel"
-              value="MANAGER"
-              [(ngModel)]="formData.accessLevel"
-              [class.is-invalid]="errorMessage()" (input)="errorMessage.set('')"
-            />
-            <span class="radio-mark"></span>
-            <span class="label-text">Gerente</span>
-          </label>
-        </div>
-        <button type="submit" id="send" (click)="setLoginPage('registerOrg')">Continuar</button>
-        <button id="return" (click)="setLoginReturnPage('login'); resetAssets()">Voltar ao Login</button>
       </div>
-    </div>
-    }
-    @else if (currentLoginPage() === "registerOrg") {
-      <div class="login-container" id="login">
-      <img src="/logo_black.png" alt="Copernicus Brasil">
-      <h1>Qual sua Organização?</h1>
-      @if (errorMessage()) {
-        <p id="error-p" class="error-message">
-          {{ errorMessage() }}
-        </p>
-      }
-      <div class="input-group">
-        <div class="radio-group">
-          <label class="custom-radio">
-            <input
-              type="radio"
-              name="accessLevel"
-              [value]="true"
-              [(ngModel)]="formData.hasOrganization"
-            />
-            <span class="radio-mark"></span>
-            <span class="label-text">Já estou em uma</span>
-          </label>
-          <label class="custom-radio">
-            <input
-              type="radio"
-              name="accessLevel"
-              [value]="false"
-              [(ngModel)]="formData.hasOrganization"
-            />
-            <span class="radio-mark"></span>
-            <span class="label-text">Ainda não participo</span>
-          </label>
-        </div>
-        @if (formData.hasOrganization) {
-        <div class="org-input" id="input">
-          <label for="organization">Selecione sua organização:</label>
-          <select name="organization" id="organization" [(ngModel)]="formData.organizationId">
-            <option [value]="null" disabled selected>Selecione uma empresa...</option>
-            @for (org of organizations; track org.idOrganization) {
-              <option [value]="org.idOrganization">{{ org.corporateName }}</option>
-            }
-          </select>
-        </div>
+    } @else if (currentLoginPage() === 'register') {
+      <div class="login-container animate__animated animate__fadeInRight" id="login">
+        <img src="/logo_black.png" alt="Copernicus Brasil" />
+        @if (errorMessage()) {
+          <h1 style="margin-bottom: 2rem">Crie sua Conta</h1>
+          <p id="error-p" class="error-message">
+            {{ errorMessage() }}
+          </p>
+        } @else {
+          <h1>Crie sua Conta</h1>
         }
-        @else {
+        <div class="input-group">
           <div class="name-input" id="input">
-            <label for="corpName">Nome corporativo:</label>
-            <input type="text" [(ngModel)]="formData.corporateName" name="corpName" id="corpName" placeholder="Digite o nome da empresa...">
+            <label for="name">Nome completo:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.fullName"
+              name="name"
+              id="name"
+              placeholder="Digite o seu nome..."
+              [class.is-invalid]="errorMessage()"
+              (input)="errorMessage.set('')"
+            />
           </div>
-          <div class="cnpj-input" id="input">
-            <label for="cnpj">CNPJ:</label>
-            <input type="text" [(ngModel)]="formData.registrationCode" name="cnpj" id="cnpj" placeholder="Digite o CNPJ...">
+          <div class="input-row">
+            <div class="email-input" id="input">
+              <label for="email">E-mail:</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.email"
+                name="email"
+                id="email"
+                placeholder="Digite o seu e-mail..."
+                [class.is-invalid]="errorMessage()"
+                (input)="errorMessage.set('')"
+              />
+            </div>
+            <div class="password-input" id="input">
+              <label for="pass">Senha:</label>
+              <div class="see-pass">
+                <input
+                  [type]="showPass() ? 'text' : 'password'"
+                  name="pass"
+                  id="pass"
+                  [(ngModel)]="formData.password"
+                  placeholder="Digite sua senha..."
+                  [class.is-invalid]="errorMessage()"
+                  (input)="errorMessage.set('')"
+                />
+                <button>
+                  <fa-icon
+                    [icon]="showPass() ? faEyeSlash : faEye"
+                    (click)="togglePasswordVisibility()"
+                    style="color: #000"
+                  ></fa-icon>
+                </button>
+              </div>
+            </div>
           </div>
-        }
-        <button type="submit" id="send" (click)="onRegisterSubmit()" [disabled]="isLoading()">
-          {{ isLoading() ? 'Cadastrando...' : 'Criar Conta e ir para Login' }}
-        </button>
-        <button id="return" (click)="setLoginReturnPage('login'); resetAssets()">Voltar ao Login</button>
+          <div class="radio-group">
+            <h2>Nível de Acesso:</h2>
+            <label class="custom-radio">
+              <input
+                type="radio"
+                name="accessLevel"
+                value="OPERATOR"
+                [(ngModel)]="formData.accessLevel"
+                [class.is-invalid]="errorMessage()"
+                (input)="errorMessage.set('')"
+              />
+              <span class="radio-mark"></span>
+              <span class="label-text">Operador</span>
+            </label>
+            <label class="custom-radio">
+              <input
+                type="radio"
+                name="accessLevel"
+                value="MANAGER"
+                [(ngModel)]="formData.accessLevel"
+                [class.is-invalid]="errorMessage()"
+                (input)="errorMessage.set('')"
+              />
+              <span class="radio-mark"></span>
+              <span class="label-text">Gerente</span>
+            </label>
+          </div>
+          <button type="submit" id="send" (click)="setLoginPage('registerOrg')">Continuar</button>
+          <button id="return" (click)="setLoginReturnPage('login'); resetAssets()">
+            Voltar ao Login
+          </button>
+        </div>
       </div>
-    </div>
+    } @else if (currentLoginPage() === 'registerOrg') {
+      <div class="login-container animate__animated animate__fadeInRight" id="login">
+        <img src="/logo_black.png" alt="Copernicus Brasil" />
+        <h1>Qual sua Organização?</h1>
+        @if (errorMessage()) {
+          <p id="error-p" class="error-message">
+            {{ errorMessage() }}
+          </p>
+        }
+        <div class="input-group">
+          <div class="radio-group">
+            <label class="custom-radio">
+              <input
+                type="radio"
+                name="hasOrg"
+                [value]="true"
+                (click)="this.errorMessage.set('')"
+                [(ngModel)]="formData.hasOrganization"
+              />
+              <span class="radio-mark"></span>
+              <span class="label-text">Já estou em uma</span>
+            </label>
+            <label class="custom-radio">
+              <input
+                type="radio"
+                name="hasOrg"
+                [value]="false"
+                (click)="this.errorMessage.set('')"
+                [(ngModel)]="formData.hasOrganization"
+              />
+              <span class="radio-mark"></span>
+              <span class="label-text">Ainda não participo</span>
+            </label>
+          </div>
+          @if (formData.hasOrganization) {
+            <div class="org-input" id="input">
+              <label for="organization">Selecione sua organização:</label>
+              <select
+                name="organization"
+                id="organization"
+                [(ngModel)]="formData.organizationId"
+                [class.is-invalid]="errorMessage()"
+                (change)="errorMessage.set('')"
+              >
+                <option [value]="null" disabled selected>Selecione uma empresa...</option>
+                @for (org of organizations; track org.idOrganization) {
+                  <option [value]="org.idOrganization">{{ org.corporateName }}</option>
+                }
+              </select>
+            </div>
+          } @else {
+            <div class="name-input" id="input">
+              <label for="corpName">Nome corporativo:</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.corporateName"
+                [class.is-invalid]="errorMessage()"
+                (input)="errorMessage.set('')"
+                name="corpName"
+                id="corpName"
+                placeholder="Digite o nome da empresa..."
+              />
+            </div>
+            <div class="cnpj-input" id="input">
+              <label for="cnpj">CNPJ:</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.registrationCode"
+                (ngModelChange)="onCnpjInput($event)"
+                [class.is-invalid]="errorMessage()"
+                (input)="errorMessage.set('')"
+                name="cnpj"
+                id="cnpj"
+                placeholder="Digite o CNPJ..."
+                maxlength="18"
+              />
+            </div>
+          }
+          <button type="submit" id="send" (click)="onRegisterSubmit()" [disabled]="isLoading()">
+            {{ isLoading() ? 'Cadastrando...' : 'Criar Conta e ir para Login' }}
+          </button>
+          <button id="return" (click)="setLoginReturnPage('login'); resetAssets()">
+            Voltar ao Login
+          </button>
+        </div>
+      </div>
     }
   </div>
 </main>
