@@ -3,7 +3,7 @@
 **Nota:** este projeto utiliza MySQL como banco de dados, portanto não há políticas RLS (Row-Level Security) do PostgreSQL. As regras de autorização (MANAGER/OPERATOR) são implementadas na camada de serviço (`service/`) da aplicação.
 
 <p align="center">
-Desenvolvivo como uma forma de desafio em Kotlin.
+Desenvolvido como uma forma de desafio em Kotlin.
 </p>
 
 <p align="center">
@@ -102,7 +102,7 @@ O banco `copernicus_db` será criado automaticamente na primeira execução.
 
 ### Abrindo o front-end
 
-1. Com o IntelliJ aberto rodando a API, abra a pasta `copernicus-api` que veio dentro do git clone e digite `code .` para abrir o projeto Angular no VSCode.
+1. Com o IntelliJ aberto rodando a API, abra a pasta `copernicus.api` que veio dentro do git clone e digite `code .` para abrir o projeto Angular no VSCode.
 
 2. Após isso, no terminal do VSCode (abra com Ctrl + '), digite `npm i` para instalar as dependências do projeto, e depois de instaladas, digite `ng serve` para rodar o aplicativo.
 
