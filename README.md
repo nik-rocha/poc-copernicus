@@ -42,13 +42,12 @@ O Copernicus Brasil é um sistema de gerenciamento de empresas de tecnologia. Ne
 
 Para rodar esse projeto, é necessário possuir:
 
-* Java JRE 8 ou mais, e Java JDK 21 ou mais
+* Java JDK 21 ou superior
 * Node.js
 * NPM
 * Git, permitindo a clonagem do repositório
-* IntelliJ com permissão para Kotlin e Java, para abrir e rodar a API do sistema
+* Uma IDE de sua preferência (recomendado: IntelliJ para o backend, VSCode para o frontend)
 * MySQL, contendo MySQL Server e opcionalmente MySQL Workbench para visualização do banco
-* Visual Studio Code com o Angular instalado no diretório do sistema
 
 ## 💻 Tecnologias Utilizadas
 
